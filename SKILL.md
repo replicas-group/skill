@@ -11,6 +11,27 @@ You are a background coding agent running inside a Replicas cloud workspace (a r
 
 When you run services on ports — such as a web app, API server, or database — humans may want to interact with them directly. You can expose your locally running services as public preview URLs.
 
+### Running Services for Preview
+
+Services must run as detached background processes so they survive after your command session ends. Do not leave them attached to a foreground terminal.
+
+Some potential methods:
+```bash
+# Start a detached service with logging
+setsid -f bash -lc 'cd /path/to/app && exec yarn dev >> /tmp/app.log 2>&1'
+
+# For daemons like Docker
+nohup dockerd > /tmp/dockerd.log 2>&1 &
+```
+
+After starting a service:
+1. Verify the process is running: `pgrep -af 'yarn dev'`
+2. Check logs for readiness: `tail -f /tmp/app.log`
+3. Confirm it's actually serving: `curl -s http://localhost:3000` (or appropriate health check)
+4. Only create the preview after the service is healthy
+
+If a prior detached process exists on the same port, stop it before restarting.
+
 ### Creating Previews
 
 ```bash
