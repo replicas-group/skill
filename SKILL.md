@@ -41,6 +41,9 @@ replicas preview create <port>
 # Expose a port with authentication (requires Replicas login to access)
 replicas preview create <port> --authenticated
 
+# Start the built-in virtual desktop and print its preview URL
+replicas desktop start
+
 # List all active preview URLs
 replicas preview list
 ```
@@ -82,5 +85,6 @@ When you expose multiple services that reference each other, you must update the
 - After starting any service that a human should be able to view or interact with
 - When verifying frontend/backend integrations visually
 - When the task involves UI work that benefits from human review
+- When GUI automation is needed, start the virtual desktop with `replicas desktop start`
 
 It is your responsibility to make previews work for outsiders as well as they work for you on localhost. If at any time you need to see the public URLs that have been created, read `~/.replicas/preview-ports.json`.
