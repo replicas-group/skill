@@ -21,32 +21,30 @@ replicas desktop stop
 
 `replicas desktop start` launches the workspace desktop stack and prints the noVNC URL. You do not need to create a manual preview for the desktop; the command handles that flow itself.
 
-### Desktop Automation Helpers
+### Desktop Automation
 
-Use the scripts in `scripts/` for X11-level automation once the desktop is running.
+All desktop interactions are available as `replicas desktop` subcommands. The desktop must be running first (`replicas desktop start`).
 
 ```bash
-scripts/open-chrome.sh https://example.com
-scripts/screenshot.sh
-scripts/click.sh 400 300
-scripts/type_text.sh "hello"
-scripts/key.sh ctrl+l
+replicas desktop open-chrome --url https://example.com
+replicas desktop screenshot
+replicas desktop click 400 300
+replicas desktop type "hello"
+replicas desktop key ctrl+l
 ```
 
-Available helpers:
-- `scripts/screenshot.sh` - capture the desktop as base64 PNG
-- `scripts/open-chrome.sh` - open Chrome in the virtual desktop
-- `scripts/click.sh` - click at coordinates
-- `scripts/type_text.sh` - type text into the focused window
-- `scripts/key.sh` - send a key or key chord
-- `scripts/drag.sh` - drag from one coordinate to another
-- `scripts/scroll.sh` - scroll in a direction
-- `scripts/mouse_move.sh` - move the cursor
-- `scripts/cursor_position.sh` - print the current cursor coordinates
-- `scripts/mouse_down.sh` / `scripts/mouse_up.sh` - low-level mouse button control
-- `scripts/hold_key.sh` - hold a key for a duration
-
-Assume `DISPLAY=:99` unless the environment tells you otherwise.
+Available commands:
+- `replicas desktop screenshot` — capture the desktop as base64 PNG
+- `replicas desktop open-chrome [--url <url>]` — open Chrome in the virtual desktop
+- `replicas desktop click <x> <y> [--kind left|right|middle|double|triple]` — click at coordinates
+- `replicas desktop type <text>` — type text into the focused window
+- `replicas desktop key <keys...>` — send a key or key chord (e.g. `ctrl+c`, `Return`)
+- `replicas desktop drag <fromX> <fromY> <toX> <toY> [--button left|right|middle]` — drag between coordinates
+- `replicas desktop scroll <up|down|left|right> [--steps <n>]` — scroll in a direction
+- `replicas desktop mouse-move <x> <y>` — move the cursor
+- `replicas desktop cursor-position` — print the current cursor coordinates
+- `replicas desktop mouse-down [--button left|right|middle]` / `replicas desktop mouse-up [--button left|right|middle]` — low-level mouse button control
+- `replicas desktop hold-key <key> [--duration <ms>]` — hold a key for a duration (default 250ms)
 
 ## Preview URLs
 
