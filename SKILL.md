@@ -7,6 +7,47 @@ description: Guide for background coding agents running inside Replicas cloud wo
 
 You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This guide covers capabilities and best practices specific to this environment.
 
+## Virtual Desktop
+
+Replicas workspaces can expose a built-in virtual desktop for GUI automation. This is separate from normal app previews.
+
+### Starting The Desktop
+
+```bash
+replicas desktop start
+replicas desktop status
+replicas desktop stop
+```
+
+`replicas desktop start` launches the workspace desktop stack and prints the noVNC URL. You do not need to create a manual preview for the desktop; the command handles that flow itself.
+
+### Desktop Automation Helpers
+
+Use the scripts in `scripts/` for X11-level automation once the desktop is running.
+
+```bash
+scripts/open-chrome.sh https://example.com
+scripts/screenshot.sh
+scripts/click.sh 400 300
+scripts/type_text.sh "hello"
+scripts/key.sh ctrl+l
+```
+
+Available helpers:
+- `scripts/screenshot.sh` - capture the desktop as base64 PNG
+- `scripts/open-chrome.sh` - open Chrome in the virtual desktop
+- `scripts/click.sh` - click at coordinates
+- `scripts/type_text.sh` - type text into the focused window
+- `scripts/key.sh` - send a key or key chord
+- `scripts/drag.sh` - drag from one coordinate to another
+- `scripts/scroll.sh` - scroll in a direction
+- `scripts/mouse_move.sh` - move the cursor
+- `scripts/cursor_position.sh` - print the current cursor coordinates
+- `scripts/mouse_down.sh` / `scripts/mouse_up.sh` - low-level mouse button control
+- `scripts/hold_key.sh` - hold a key for a duration
+
+Assume `DISPLAY=:99` unless the environment tells you otherwise.
+
 ## Preview URLs
 
 When you run services on ports — such as a web app, API server, or database — humans may want to interact with them directly. You can expose your locally running services as public preview URLs.
