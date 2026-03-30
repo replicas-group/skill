@@ -7,6 +7,45 @@ description: Guide for background coding agents running inside Replicas cloud wo
 
 You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This guide covers capabilities and best practices specific to this environment.
 
+## Virtual Desktop
+
+Replicas workspaces can expose a built-in virtual desktop for GUI automation. This is separate from normal app previews.
+
+### Starting The Desktop
+
+```bash
+replicas desktop start
+replicas desktop status
+replicas desktop stop
+```
+
+`replicas desktop start` launches the workspace desktop stack and prints the noVNC URL. You do not need to create a manual preview for the desktop; the command handles that flow itself.
+
+### Desktop Automation
+
+All desktop interactions are available as `replicas desktop` subcommands. The desktop must be running first (`replicas desktop start`).
+
+```bash
+replicas desktop open-chrome --url https://example.com
+replicas desktop screenshot
+replicas desktop click 400 300
+replicas desktop type "hello"
+replicas desktop key ctrl+l
+```
+
+Available commands:
+- `replicas desktop screenshot` — capture the desktop as base64 PNG
+- `replicas desktop open-chrome [--url <url>]` — open Chrome in the virtual desktop
+- `replicas desktop click <x> <y> [--kind left|right|middle|double|triple]` — click at coordinates
+- `replicas desktop type <text>` — type text into the focused window
+- `replicas desktop key <keys...>` — send a key or key chord (e.g. `ctrl+c`, `Return`)
+- `replicas desktop drag <fromX> <fromY> <toX> <toY> [--button left|right|middle]` — drag between coordinates
+- `replicas desktop scroll <up|down|left|right> [--steps <n>]` — scroll in a direction
+- `replicas desktop mouse-move <x> <y>` — move the cursor
+- `replicas desktop cursor-position` — print the current cursor coordinates
+- `replicas desktop mouse-down [--button left|right|middle]` / `replicas desktop mouse-up [--button left|right|middle]` — low-level mouse button control
+- `replicas desktop hold-key <key> [--duration <ms>]` — hold a key for a duration (default 250ms)
+
 ## Preview URLs
 
 When you run services on ports — such as a web app, API server, or database — humans may want to interact with them directly. You can expose your locally running services as public preview URLs.
