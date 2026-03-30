@@ -7,23 +7,6 @@ description: Guide for background coding agents running inside Replicas cloud wo
 
 You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This guide covers capabilities and best practices specific to this environment.
 
-## Writing Plans and Documents
-
-When users ask you to write plans, implementation docs, research notes, markdown files, or any text document intended for the user to read, write them to `~/.replicas/plans/` using a descriptive filename (e.g., `~/.replicas/plans/add-auth-system.md`, `~/.replicas/plans/migration-strategy.md`).
-
-All files in this directory are viewable by the user through the Replicas dashboard. This is the default location unless the user explicitly specifies a different path.
-
-**When to use `~/.replicas/plans/`:**
-- Planning or architecture documents
-- Implementation proposals
-- Research summaries or analysis
-- Any markdown/text file written with the intent that the user can read it
-
-**When NOT to use it:**
-- Source code files that belong in the repository
-- Configuration files for the project
-- Files the user explicitly asks to place elsewhere
-
 ## Preview URLs
 
 When you run services on ports — such as a web app, API server, or database — humans may want to interact with them directly. You can expose your locally running services as public preview URLs.
