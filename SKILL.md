@@ -15,7 +15,7 @@ When you run services on ports â€” such as a web app, API server, or database â€
 
 Services must run as detached background processes so they survive after your command session ends. Do not leave them attached to a foreground terminal.
 
-Some potential methods:
+Some methods to run detached services:
 ```bash
 # Start a detached service with logging
 setsid -f bash -lc 'cd /path/to/app && exec yarn dev >> /tmp/app.log 2>&1'
@@ -27,7 +27,7 @@ nohup dockerd > /tmp/dockerd.log 2>&1 &
 After starting a service:
 1. Verify the process is running: `pgrep -af 'yarn dev'`
 2. Check logs for readiness: `tail -f /tmp/app.log`
-3. Confirm it's actually serving: `curl -s http://localhost:3000` (or appropriate health check)
+3. Verify it's serving requests: `curl -s http://localhost:3000`
 4. Only create the preview after the service is healthy
 
 If a prior detached process exists on the same port, stop it before restarting.
