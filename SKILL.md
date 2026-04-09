@@ -5,82 +5,50 @@ description: Guide for background coding agents running inside Replicas cloud wo
 
 # Replicas Agent
 
-You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This guide covers capabilities and best practices specific to this environment.
+You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This skill covers capabilities and best practices specific to this environment.
 
-## Preview URLs
+## Capabilities
 
-When you run services on ports — such as a web app, API server, or database — humans may want to interact with them directly. You can expose your locally running services as public preview URLs.
+This skill provides detailed guides for the following capabilities. **Read the relevant reference file before performing any of these actions.**
 
-### Running Services for Preview
+### Previews
+Expose locally running services (web apps, APIs, databases) as public preview URLs so humans can interact with them directly.
 
-Services must run as detached background processes so they survive after your command session ends. Do not leave them attached to a foreground terminal.
+**Reference:** `references/PREVIEWS.md`
 
-Some potential methods:
-```bash
-# Start a detached service with logging
-setsid -f bash -lc 'cd /path/to/app && exec yarn dev >> /tmp/app.log 2>&1'
+Use this when:
+- You need to start a service that a human should view or interact with
+- The task involves UI work that benefits from human review
+- You are verifying frontend/backend integrations visually
 
-# For daemons like Docker
-nohup dockerd > /tmp/dockerd.log 2>&1 &
-```
+### Slack
+Send messages, read threads, search conversations, and upload files via the Slack Web API.
 
-After starting a service:
-1. Verify the process is running: `pgrep -af 'yarn dev'`
-2. Check logs for readiness: `tail -f /tmp/app.log`
-3. Confirm it's actually serving: `curl -s http://localhost:3000` (or appropriate health check)
-4. Only create the preview after the service is healthy
+**Reference:** `references/SLACK.md`
 
-If a prior detached process exists on the same port, stop it before restarting.
+Use this when:
+- You need to send a message to a Slack channel or thread
+- You need to read or fetch a Slack conversation
+- You encounter a Slack message link and need to retrieve its content
+- The task asks you to notify, update, or communicate via Slack
 
-### Creating Previews
+### Linear
+Fetch issues, update state, add comments, and search via the Linear GraphQL API.
 
-```bash
-# Expose a local port as a public URL
-replicas preview create <port>
+**Reference:** `references/LINEAR.md`
 
-# Expose a port with authentication (requires Replicas login to access)
-replicas preview create <port> --authenticated
+Use this when:
+- You encounter a Linear issue link and need to understand the task
+- You need to update an issue's state (e.g. mark as done)
+- You need to comment on or search for Linear issues
 
-# List all active preview URLs
-replicas preview list
-```
+### GitHub
+Use the pre-authenticated `gh` CLI for pull requests, issues, actions, and API calls.
 
-The `create` command prints the public URL. You can also read all active previews from `~/.replicas/preview-ports.json`.
+**Reference:** `references/GITHUB.md`
 
-### Authenticated vs Unauthenticated Previews
-
-Previews can optionally require cookie-based authentication. When `--authenticated` is set, only users who are logged in to replicas.dev can access the preview.
-
-**When to use `--authenticated`:**
-- Frontends / web apps that humans will view directly in their browser. Since the user is already logged in to replicas.dev, the auth cookie is automatically present and the preview works seamlessly.
-
-**When NOT to use `--authenticated`:**
-- Backend APIs and other services that are called by frontend code. The frontend runs in the user's browser under a different origin, so it cannot forward the Replicas auth cookie to the backend. Making backends authenticated will cause cross-service requests to fail with 401 errors.
-
-**Rule of thumb:** Make frontend previews authenticated, leave backend/API previews unauthenticated.
-
-### Cross-Service References
-
-When you expose multiple services that reference each other, you must update their configuration so they use preview URLs instead of `localhost`.
-
-**Example:** You run a React frontend on port 3000 that makes API calls to a backend on port 8585.
-
-1. Create previews for both:
-   ```bash
-   replicas preview create 8585
-   # Output: https://8585-<hash>.replicas.dev
-   replicas preview create 3000 --authenticated
-   # Output: https://3000-<hash>.replicas.dev
-   ```
-
-2. Update the frontend's environment so its API base URL points to the backend's **preview URL**, not `localhost:8585`. For example, set `REACT_APP_API_URL=https://8585-<hash>.replicas.dev` or update the relevant config file.
-
-**Why?** The frontend works on `localhost` for you because both services run on the same machine. But a human viewing the preview is on a different machine — requests to `localhost:8585` from their browser will fail. They need the public preview URL instead.
-
-### When to Create Previews
-
-- After starting any service that a human should be able to view or interact with
-- When verifying frontend/backend integrations visually
-- When the task involves UI work that benefits from human review
-
-It is your responsibility to make previews work for outsiders as well as they work for you on localhost. If at any time you need to see the public URLs that have been created, read `~/.replicas/preview-ports.json`.
+Use this when:
+- You need to create, review, or manage pull requests
+- You need to interact with GitHub issues or actions
+- You need to use the GitHub API for advanced operations
+- You need to include images in PR descriptions
