@@ -52,3 +52,13 @@ Use this when:
 - You need to interact with GitHub issues or actions
 - You need to use the GitHub API for advanced operations
 - You need to include images in PR descriptions
+
+### Docker
+Start and use the Docker daemon in Replicas workspaces. Docker is pre-installed but the daemon does not auto-start.
+
+**Reference:** `references/DOCKER.md`
+
+Use this when:
+- You need to run `docker` or `docker compose` commands
+- You need to build or run Docker containers
+- Your task involves containerized services or Docker-based workflows
