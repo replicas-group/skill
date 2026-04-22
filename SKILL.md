@@ -12,7 +12,7 @@ You are a background coding agent running inside a Replicas cloud workspace (a r
 This skill provides detailed guides for the following capabilities. **Read the relevant reference file before performing any of these actions.**
 
 ### Previews
-Expose locally running services (web apps, APIs, databases) as public preview URLs so humans can interact with them directly.
+Expose locally running services (web apps, APIs, databases) as public preview URLs so humans can interact with them directly in a browser.
 
 **Reference:** `references/PREVIEWS.md`
 
