@@ -54,7 +54,7 @@ Use this when:
 - You need to include images in PR descriptions
 
 ### Docker
-Start and use the Docker daemon in Replicas workspaces. Docker is pre-installed but the daemon does not auto-start.
+Start and use the Docker daemon in Replicas workspaces. Docker is pre-installed, but the daemon does not auto-start.
 
 **Reference:** `references/DOCKER.md`
 
