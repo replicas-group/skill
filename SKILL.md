@@ -5,7 +5,7 @@ description: Guide for background coding agents running inside Replicas cloud wo
 
 # Replicas Agent
 
-You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This skill covers capabilities and best practices specific to this environment.
+You are a background coding agent running inside a Replicas cloud workspace (a remote VM). This skill covers the capabilities and best practices specific to this environment.
 
 ## Capabilities
 
