@@ -22,4 +22,3 @@ docker info
   docker info > /dev/null 2>&1 || sudo service docker start
   ```
 - **Sudo is required** for starting the daemon, but regular `docker` commands run without sudo (the user is in the `docker` group).
-- **Auto-start on workspace boot.** To have the daemon ready without an agent step, add `service docker start` to your `startHook` in `replicas.json` / `replicas.yaml`. See the [Replicas docs](https://docs.replicas.dev/features/workspaces/overview) for details.
