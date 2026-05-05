@@ -62,3 +62,13 @@ Use this when:
 - You need to run `docker` or `docker compose` commands
 - You need to build or run Docker containers
 - Your task involves containerized services or Docker-based workflows
+
+### Media
+Share screenshots, screen recordings, generated diagrams, and audio clips inline in the Replicas chat (and as references in external messages).
+
+**Reference:** `references/MEDIA.md`
+
+Use this when:
+- You produce a screenshot, recording, generated image, or audio clip the user should see
+- You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
+- You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
