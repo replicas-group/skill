@@ -72,3 +72,25 @@ Use this when:
 - You produce a screenshot, recording, generated image, or audio clip the user should see
 - You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
 - You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
+
+### Browser
+Drive a real Chromium browser from the workspace using `agent-browser` for navigation, screenshots, snapshots, login flows, scraping, and other web-side automation.
+
+**Reference:** `references/BROWSER.md`
+
+Use this when:
+- You need to interact with a web app (test a flow, log in, take a screenshot of a page, scrape content)
+- You need browser-side data (snapshots, page text, accessibility tree, network activity)
+- The work is browser-only and does not need a visible terminal alongside
+
+For browser + terminal visible together, see the **Desktop** skill below.
+
+### Desktop
+Spin up a virtual desktop so you can take full-screen screenshots, record screen videos, or hand the user a live "watch over your shoulder" URL — useful for showing CLI + browser side-by-side.
+
+**Reference:** `references/DESKTOP.md`
+
+Use this when:
+- The user asks for a screen recording, video, or screenshot of "what you see"
+- The user asks for proof — login flow, UI state, end-to-end demo
+- The user wants to watch you work on a UI live
