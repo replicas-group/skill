@@ -2,90 +2,95 @@
 
 A virtual desktop runs inside your workspace on a hidden X display. It exists so you can **show** humans what you are doing — the desktop is purely a stage for visual proof:
 
-- Take a full-screen screenshot that includes both your terminal and a browser window.
-- Record a screen video while you reproduce or demonstrate something.
-- Hand the human a live "watch over your shoulder" URL.
+- A full-screen screenshot of your terminal and a browser together.
+- A screen recording of you reproducing or demonstrating something.
+- A live "watch over your shoulder" URL the human can open in their browser.
 
 Humans can only **view**; they cannot click or type into the desktop. You are the only actor that drives it.
 
-## When to use
-
-- The user asks for a screen recording, a video, or a screenshot of "what you see".
-- The user asks for proof — login flow, UI state, end-to-end demo.
-- The user wants to watch you work on a UI live.
-
-If the task is purely browser automation with no need for visible terminal context, prefer `agent-browser` directly (it has its own dashboard at `agent-browser dashboard start`). The full desktop is for the **terminal + browser side-by-side** case.
+If the task is browser-only (no terminal in the frame), use `agent-browser` directly instead — it has its own screenshot/PDF without spinning up a desktop. The full desktop is for the **terminal + browser side-by-side** case.
 
 ## Commands
 
 ```bash
-replicas desktop start             # boot the desktop, returns view URL (idempotent)
-replicas desktop stop              # explicit stop (rare — idle handles this)
-replicas desktop status            # current state
-replicas desktop screenshot [path] # full-display PNG via maim
-replicas desktop record start      # begin screen recording
-replicas desktop record stop       # end recording, returns file path
+replicas desktop start                     # boot the desktop, returns view-only URL (idempotent)
+replicas desktop browser <url>             # open a headed browser on the desktop. Auto-starts the desktop.
+replicas desktop terminal [--cmd "..."]    # open a terminal window. Auto-starts the desktop.
+replicas desktop screenshot [path]         # full-display PNG via maim
+replicas desktop record start              # begin recording (capped at 10 min, 60fps, 1920x1080)
+replicas desktop record stop               # end recording, returns the mp4 path
+replicas desktop mousemove <x> <y>         # smoothly glide the visible cursor
+replicas desktop status                    # current state
+replicas desktop stop                      # explicit stop (rare — idle auto-stop handles this)
 ```
 
-`start` is idempotent — calling it twice is safe and cheap. After 20 minutes of no agent activity (no screenshots, recordings, or other desktop calls), the desktop auto-stops to free resources.
+`start` is idempotent. After 20 minutes of no agent activity (no screenshots, recordings, or other desktop calls) the desktop auto-stops to free resources.
 
-## Typical flow
+`DISPLAY=:99` is set globally in the workspace, so you do not need to prefix `DISPLAY=:99` on commands.
+
+## Browser and terminal helpers
+
+Prefer `replicas desktop browser <url>` and `replicas desktop terminal` over launching `agent-browser open --headed` or `xfce4-terminal` yourself. Both auto-start the desktop and pass the right flags.
+
+**For terminal commands during recordings, strongly prefer `--cmd`:**
 
 ```bash
-# 1. Boot the desktop
-replicas desktop start
-
-# 2. Open whatever you want to show (browser via agent-browser, terminal commands, etc.)
-DISPLAY=:99 agent-browser open --headed http://localhost:3000
-
-# 3. Capture the result
-replicas desktop screenshot /tmp/proof.png
-
-# 4. Share via the media skill — this is mandatory for anything humans need to see
-replicas media upload /tmp/proof.png
-# Paste the returned ![…](url) line into your reply
+replicas desktop terminal --cmd 'echo "Replicas desktop"; date; uname -a'
 ```
 
-## Recording
+xfce4-terminal uses VTE, which silently ignores `xdotool key --window`. Typing into a focused terminal is fragile — pre-bake the commands with `--cmd` so the terminal runs them itself. Only fall back to "click to focus, then `xdotool type`" if the commands need to be issued mid-recording based on something interactive.
+
+## Cursor visibility — critical for recordings
+
+**The cursor does not move automatically.** Neither `agent-browser` (CDP) nor `xdotool windowmove/windowsize/key/type` move the visible mouse cursor. A recording where you just run commands will show the page reacting and windows changing but the cursor sitting frozen in one corner — looks broken.
+
+Before every interaction in a recording (click, scroll, switching windows, typing into a terminal) call `replicas desktop mousemove X Y` to glide the cursor to where the action will happen.
 
 ```bash
-# Start
+replicas desktop mousemove 1400 540          # before scrolling a browser at the right side
+replicas desktop mousemove 1400 400          # before switching focus to a terminal on the right
+replicas desktop mousemove 1100 600          # before typing into a terminal at that position
+```
+
+Default screen is 1920x1080. Coordinates are pixels.
+
+Options: `--ms <duration>` (default 320), `--easing <linear|ease-in|ease-out|ease-in-out>` (default ease-out).
+
+## Window positioning
+
+Up to you — use `xdotool windowsize` and `xdotool windowmove` directly. There is no high-level layout helper. After launching browser/terminal, find the windows by class and place them:
+
+```bash
+TERM_ID=$(xdotool search --class "xfce4-terminal" | tail -1)
+BROW_ID=$(xdotool search --class "Chrome" | tail -1)
+xdotool windowsize $BROW_ID 1100 920 windowmove $BROW_ID 800 60
+xdotool windowsize $TERM_ID 720 540 windowmove $TERM_ID 50 60
+```
+
+## Typical recording flow
+
+```bash
+# 1. Open the windows you want to demonstrate
+replicas desktop browser https://replicas.dev
+replicas desktop terminal --cmd 'sleep 3; echo Ready; date; uname -a; sleep 30'
+
+# 2. Position them (optional, use xdotool)
+TERM_ID=$(xdotool search --class "xfce4-terminal" | tail -1)
+BROW_ID=$(xdotool search --class "Chrome" | tail -1)
+xdotool windowsize $BROW_ID 1100 920 windowmove $BROW_ID 800 60
+xdotool windowsize $TERM_ID 720 540 windowmove $TERM_ID 50 60
+
+# 3. Start recording, drive cursor between actions
 replicas desktop record start
-# → { "recordingId": "...", "path": "/home/ubuntu/.replicas/desktop/artifacts/recordings/<ts>.mp4" }
+replicas desktop mousemove 1300 500          # over the browser
+agent-browser scroll down 500
+replicas desktop mousemove 400 400           # over the terminal
+sleep 3
+replicas desktop record stop                 # → /home/ubuntu/.replicas/desktop/artifacts/recordings/<ts>.mp4
 
-# Do the thing you want to demonstrate
-agent-browser open --headed http://localhost:3000
-agent-browser click @e1
-# ...
-
-# Stop
-replicas desktop record stop
-# → { "path": "...", "durationMs": 47823 }
-
-# Upload and share
+# 4. Share via the media skill
 replicas media upload /home/ubuntu/.replicas/desktop/artifacts/recordings/<ts>.mp4
 ```
-
-**Recording cap:** 10 minutes maximum. The recording auto-stops at the cap and the file is finalized. If you need longer, do multiple recordings and link them.
-
-**Frame rate:** 60 FPS, 1920×1080. Matches the recommended defaults in the Media skill.
-
-## Browser on the desktop
-
-The desktop is just an X display. Any GUI app you launch with `DISPLAY=:99` appears on it. For browser work, use `agent-browser` in headed mode:
-
-```bash
-DISPLAY=:99 agent-browser open --headed http://localhost:3000
-```
-
-Or set the env once for the session:
-
-```bash
-export DISPLAY=:99
-agent-browser open --headed http://localhost:3000
-```
-
-agent-browser drives the browser via CDP (reliable, fast). The browser window lives on the desktop where humans can see it via the live URL or where it can be captured by a screenshot or recording.
 
 ## Live view URL
 
@@ -99,11 +104,12 @@ The URL works for anyone in the org with workspace access. It stays valid until 
 
 ## Artifacts
 
-Screenshots and recordings save under `~/.replicas/desktop/artifacts/`. They live with the workspace — when the workspace is deleted, the artifacts go with it. **Always upload via `replicas media upload` before relying on the file existing for the user**, since the upload returns a chat-embeddable URL backed by Replicas storage.
+Screenshots and recordings save under `~/.replicas/desktop/artifacts/`. They live with the workspace — when the workspace is deleted, the artifacts go with it. Always upload via `replicas media upload` before relying on the file existing for the user, since the upload returns a chat-embeddable URL backed by Replicas storage.
 
 ## What you do NOT need to do
 
 - **Do not** start Xvfb, x11vnc, ffmpeg, or noVNC by hand — `replicas desktop start` handles the whole stack.
-- **Do not** install a window manager, theme, or browser yourself — the workspace image already has them.
-- **Do not** symlink xdotool or wrap mouse moves — browser automation goes through `agent-browser`.
-- **Do not** call `replicas desktop stop` after a single screenshot — idle auto-stop handles cleanup.
+- **Do not** install a window manager, theme, browser, or any apt packages yourself — the workspace image already has them.
+- **Do not** prefix `DISPLAY=:99` on commands — it is set globally.
+- **Do not** type commands into a terminal via `xdotool key --window` — VTE silently ignores it. Use `replicas desktop terminal --cmd` instead.
+- **Do not** call `replicas desktop stop` after a single screenshot — idle auto-stop handles cleanup after 20 minutes.

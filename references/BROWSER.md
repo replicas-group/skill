@@ -28,14 +28,15 @@ Do not rely on the raw file path being viewable by the user — files in the wor
 
 ## Headed mode (with the desktop)
 
-By default `agent-browser` is headless. For the rare case where you want the browser visible — to be recorded by the desktop or watched live — first start the desktop, then launch `agent-browser` with `--headed` against `DISPLAY=:99`:
+By default `agent-browser` is headless. For cases where you want the browser visible — to be recorded by the desktop or watched live — use the desktop helper:
 
 ```bash
-replicas desktop start
-DISPLAY=:99 agent-browser open --headed https://example.com
+replicas desktop browser https://example.com
 ```
 
-For headless workflows (the default), do **not** set `DISPLAY` and do **not** use `--headed`. The desktop is not required.
+That auto-starts the desktop and launches a headed Chromium on it. Prefer this over launching `agent-browser open --headed` yourself.
+
+`DISPLAY=:99` is set globally in the workspace, so if you do invoke `agent-browser` directly, you do not need to prefix `DISPLAY=:99` — just pass `--headed`. For headless workflows (the default), do not pass `--headed`. The desktop is not required for headless work.
 
 ## What you do NOT need to do
 
