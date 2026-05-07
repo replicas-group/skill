@@ -8,7 +8,7 @@ The `replicas` CLI is pre-installed and authenticated in your workspace. No addi
 
 ## When to use
 
-Whenever you produce media that the user should see (UI verification screenshot, browser automation recording, generated diagram, audio sample, etc.), upload it to Replicas first. This is **mandatory** — even if you're also sending the file elsewhere (Slack, Linear, GitHub).
+**Always** upload to Replicas every single time you produce media — screenshots, screen recordings, generated diagrams, audio samples, anything the user might want to see. No exceptions. Upload before doing anything else with the file (analyzing, deleting, sending elsewhere). This applies even when you're also sending the file to Slack, Linear, GitHub, or any other destination.
 
 ## Uploading
 
@@ -26,6 +26,8 @@ The CLI prints two lines:
 ### In your Replicas chat reply
 
 Include line 1 **verbatim** where you want the media to render inline. The chat substitutes it with an embedded image, video, or audio player. Multiple uploads can be embedded in a single reply.
+
+Also tell the user they can find the file in the **media tab** of the workspace, and include line 2 (the "View in Replicas" link) so they can open it directly. Do this for every upload, even when the media is already embedded inline.
 
 ### On external platforms (Slack, Linear, GitHub)
 
