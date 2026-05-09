@@ -13,25 +13,24 @@ The `replicas` CLI is pre-installed and authenticated in your workspace. No addi
 ## Uploading
 
 ```bash
-replicas media upload <path-to-file>
+replicas media upload <path-to-file> [<path-to-file> ...]
 ```
 
-The CLI prints two lines:
+Pass one or more file paths. Uploading several files in a single invocation is preferred over running the command repeatedly — it's faster and keeps the output grouped.
 
-1. A markdown image line: `![filename](<url>)`
-2. A "View in Replicas" link to the workspace media tab.
+For each file, the CLI prints a markdown embed line: `![filename](<url>)`. After all files are uploaded, it prints a single "View in Replicas" link to the workspace media tab.
 
 ## How to use the output
 
 ### In your Replicas chat reply
 
-Include line 1 **verbatim** where you want the media to render inline. The chat substitutes it with an embedded image, video, or audio player. Multiple uploads can be embedded in a single reply.
+Include each markdown embed line **verbatim** where you want that file to render inline. The chat substitutes each one with an embedded image, video, or audio player. Multiple embeds can appear in a single reply.
 
-Also tell the user they can find the file in the **media tab** of the workspace, and include line 2 (the "View in Replicas" link) so they can open it directly. Do this for every upload, even when the media is already embedded inline.
+Also tell the user they can find the files in the **media tab** of the workspace, and include the "View in Replicas" link so they can open it directly. Do this for every batch of uploads, even when the media is already embedded inline.
 
 ### On external platforms (Slack, Linear, GitHub)
 
-Also upload the raw bytes via that platform's own upload API (e.g. Slack `files.upload`, Linear attachments) so the recipient sees the media without needing Replicas access. **AND** include line 2 (the dashboard link) in the message so they can find the file in the Replicas media tab.
+Also upload the raw bytes via that platform's own upload API (e.g. Slack `files.upload`, Linear attachments) so the recipient sees the media without needing Replicas access. **AND** include the "View in Replicas" link in the message so they can find the files in the Replicas media tab.
 
 The Replicas upload is mandatory; the external upload is in addition to it, not instead of it.
 
@@ -63,10 +62,11 @@ Auto-detected from the filename extension:
 | `mp4`, `webm` | video |
 | `mp3`, `wav` | audio |
 
-For other extensions, pass `--kind image|video|audio` explicitly:
+For other extensions, pass `--kind image|video|audio` explicitly. The kind applies to every file in that invocation, so group files of the same kind together:
 
 ```bash
 replicas media upload diagram.svg --kind image
+replicas media upload chart-a.svg chart-b.svg --kind image
 ```
 
 ## Options
