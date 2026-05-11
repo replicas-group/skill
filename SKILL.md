@@ -72,3 +72,16 @@ Use this when:
 - You produce a screenshot, recording, generated image, or audio clip the user should see
 - You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
 - You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
+
+### Replicas (in-workspace CLI)
+Take action *with* Replicas itself — manage automations, environments (variables, files), repos, and `replicas.json` config — using the pre-installed, pre-authenticated `replicas` CLI.
+
+**Reference:** `references/REPLICAS.md`
+
+Use this when:
+- The user asks you to create, edit, run, or delete an automation
+- The user asks you to manage environments, environment variables, or environment files
+- The user asks "what envs / repos / automations do I have?"
+- The user asks you to scaffold a `replicas.json` / `replicas.yaml` in a repo
+
+For *questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.replicas.dev first and only fall back to this skill when the user is asking you to take an action.
