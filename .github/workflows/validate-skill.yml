@@ -1,0 +1,79 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install agent-skills-ts-sdk
+        run: npm install agent-skills-ts-sdk
+
+      - name: Validate SKILL.md
+        run: |
+          node -e "
+            const { parseSkillContent, validateSkillContent } = require('agent-skills-ts-sdk');
+            const fs = require('fs');
+            const content = fs.readFileSync('SKILL.md', 'utf8');
+
+            const { properties, body } = parseSkillContent(content);
+            console.log('Parsed skill:', properties.name);
+            console.log('Description:', properties.description);
+
+            const errors = validateSkillContent(content);
+            if (errors.length > 0) {
+              console.error('Validation errors:', errors);
+              process.exit(1);
+            }
+
+            if (!properties.name) {
+              console.error('ERROR: Skill must have a name');
+              process.exit(1);
+            }
+
+            if (!properties.description) {
+              console.error('ERROR: Skill must have a description');
+              process.exit(1);
+            }
+
+            if (!body || body.trim().length === 0) {
+              console.error('ERROR: Skill must have content');
+              process.exit(1);
+            }
+
+            console.log('Skill validation passed!');
+          "
+
+      - name: Verify references exist
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const content = fs.readFileSync('SKILL.md', 'utf8');
+
+            const refPattern = /references\/[A-Z]+\.md/g;
+            const refs = content.match(refPattern) || [];
+
+            let failed = false;
+            for (const ref of refs) {
+              if (!fs.existsSync(ref)) {
+                console.error('Missing reference file:', ref);
+                failed = true;
+              } else {
+                console.log('Found reference:', ref);
+              }
+            }
+
+            if (failed) process.exit(1);
+            console.log('All referenced files exist!');
+          "
