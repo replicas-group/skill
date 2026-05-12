@@ -17,4 +17,4 @@ jobs:
           node-version: "20"
 
       - name: Install skill
-        run: npx skills add . --skill replicas-agent --agent claude-code -y
+        run: npx skills add . --all --global -y
