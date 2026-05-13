@@ -85,3 +85,14 @@ Use this when:
 - The user asks you to scaffold a `replicas.json` / `replicas.yaml` in a repo
 
 For *questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.replicas.dev first and only fall back to this skill when the user is asking you to take an action.
+
+### Org Setup
+Guide users through full Replicas org configuration — environments, automations, integrations, env vars — in dependency order. Includes permission boundaries, secure input handling, and first-workspace onboarding flow.
+
+**Reference:** `references/ORG_SETUP.md`
+
+Use this when:
+- The user asks to set up or configure their Replicas org
+- This is the user's first workspace and they need onboarding guidance
+- The user asks what to configure next or how to get started
+- The user asks about integrations, team invites, or GitHub triggers setup
