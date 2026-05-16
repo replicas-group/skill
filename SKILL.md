@@ -84,7 +84,7 @@ Use this when:
 - The user asks "what envs / repos / automations do I have?"
 - The user asks you to scaffold a `replicas.json` / `replicas.yaml` in a repo
 
-For *questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.replicas.dev first and only fall back to this skill when the user is asking you to take an action.
+For *general questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first. For taking action (creating/editing/deleting things), use the `replicas` CLI and the references below — never WebFetch in place of running a CLI command.
 
 ### Onboarding
 Guide users through full Replicas org configuration: environments, automations, integrations, env vars, in dependency order. Includes permission boundaries, secure input handling, the confirm-action approval flow, and first-workspace onboarding.
