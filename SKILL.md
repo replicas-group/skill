@@ -53,6 +53,16 @@ Use this when:
 - You need to use the GitHub API for advanced operations
 - You need to include images in PR descriptions
 
+### Google Workspace (Docs, Sheets, Forms, Drive)
+Create and edit Google Docs, Sheets, and Forms via the Replicas gateway. Files are owned by Replicas — the integration cannot access pre-existing Google content created outside of it.
+
+**Reference:** `references/GOOGLE.md`
+
+Use this when:
+- You need to create or edit a Google Doc, Sheet, or Form
+- You need to share, rename, move, or delete a Replicas-created Google file
+- You need to read responses from a Replicas-created Google Form
+
 ### Docker
 Start and use the Docker daemon in Replicas workspaces. Docker is pre-installed but the daemon does not auto-start.
 
