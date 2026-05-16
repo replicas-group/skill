@@ -170,23 +170,23 @@ Edge cases:
 
 ### Step `env-vars` — Add encrypted variables
 
-Run silently: `replicas environment vars list <env>` for the active env.
+Run silently: `replicas environment vars list <env>` for the active env. One short line stating what's there (or "nothing yet"), then emit a single `:::secure-input` block. The form has multi-row support — the user can add as many KEY/Value pairs as they want and submit them all together. The env dropdown defaults to the right environment automatically.
 
-**If the user named specific keys** (e.g. "CLAUDE_API_KEY, S3_API_KEY, S3_REGION"): emit one `:::secure-input` block per key, back to back, after a one-line lead-in. Do NOT ask for values. Do NOT consolidate into a single block. See the env-vars example near the top of this guide.
+Do NOT guess key names for the user. Only the user knows which keys they need. Omit `suggested_name` unless the user explicitly named a key in chat.
 
-**If the user said "help me add some vars"** without naming specifics: pick one sensible starting key based on the repo (JS/TS → `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `DATABASE_URL`), and emit one secure-input block. Don't list options in prose.
+**If the user named specific keys** (e.g. "I need CLAUDE_API_KEY and S3_API_KEY"): emit one `:::secure-input` block with a `suggested_name` for one of the keys. The user can add more rows in the form.
 
 Block shape:
 
 ```
 :::secure-input
 action: "set-env-var"
-hint: "<one-line description of what the value is for>"
-suggested_name: "<KEY_NAME>"
+hint: "<one-line description of what env this targets, e.g. 'Keys for replicas-dev'>"
+suggested_name: "<KEY_NAME>"   # optional — only when user named a specific key
 :::
 ```
 
-On submit, the UI confirms back. Reply with a Result line linking to `<env URL>?tab=variables`, then: "Add another, or move on?"
+On submit, the UI confirms back. Reply with a Result line linking to `<env URL>?tab=variables`, then: "Want to add more, or move on?"
 
 Edge cases:
 
