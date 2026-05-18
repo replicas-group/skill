@@ -77,20 +77,24 @@ replicas repos list
 
 ### `environment`
 
-Orient in the rule-8 shape: a one-line definition, then a jot-note list of the env's parts, then the situation/CTA.
+Orient in the rule-8 shape: a one-line definition, then a jot-note list of the env's parts, then the situation/CTA. The jot-note list must cover everything an env bundles — repo, agent, system prompt, env vars / files, skills, MCPs, warm hook, warm pool — not just the early fields. And do not say "most teams stay on one" or anything that downplays specialization: teams set up **focused envs per task** so each agent has tight context for the job at hand. Global inheritance is the way to share common config across them, not a reason to consolidate.
+
+**Forbidden example names.** Do not suggest `staging`, `prod`, `dev`, or any other deploy-stage label as an env name. Those names imply prod/staging parity, not task-focused specialization. Use task-shaped names instead: `debugging`, `on-call`, `content`, `automations`, `code-review`, etc.
 
 Example for the Default-exists case:
 
-> An **environment** is the blueprint workspaces boot from. It bundles:
+> An **environment** is the blueprint workspaces boot from. It bundles everything an agent needs to do a specific kind of work:
 >
-> - **Repo** — the codebase the workspace clones
+> - **Repo** — codebase the workspace clones
 > - **Agent** — Claude, Codex, or Bedrock
-> - **System prompt** — your default instructions for the agent
-> - **Env vars / files** — secrets and config the workspace needs
+> - **System prompt** — instructions tuned for this env's job
+> - **Env vars / files** — secrets and config
+> - **Skills & MCPs** — extra capabilities you give the agent
+> - **Warm hook & pool** — setup script + hot-workspace queue for fast starts
 >
-> Anything in your **Global** env carries through to every other one, so most teams stay on one.
+> Teams usually set up **specialized envs per task** (`<repo>-debugging`, `<repo>-on-call`, `<repo>-content`) so each agent has focused context for the work at hand. Anything common across them can live in the **Global** env, which inherits everywhere.
 >
-> Replicas already auto-created `Default <owner>/<repo>` when you connected the repo. **Keep using it, or set up a separate one (e.g. `<repo>-staging`)?**
+> Replicas auto-created `Default <owner>/<repo>` when you connected the repo. **Keep using it, or spin up a focused one (e.g. `<repo>-debugging`)?**
 
 Branches by what `replicas environment list` and `replicas repos list` returned:
 
