@@ -137,8 +137,9 @@ Open with framing plus a few common scripts so the user has a starting point:
 Default the environment to the one from step 1. Branches:
 
 - **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** that's only enabled after a passing test. The script body must come strictly from what the user said in chat (or one of the listed examples they picked); if they're vague, ask one short clarifier first. Synthetic reply on save: `Saved warm hook for <env>.`.
-- **Clear an existing hook** → `:::confirm-action` with `kind: other`, `command: replicas environment warm-hook clear <env>`.
 - **Skip** → emit `:::onboarding-advance from: warm-hook to: warm-pool`.
+
+If the user wants to **remove an existing warm hook entirely** (not replace it with a different script), point them at the dashboard: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`. There's no chat block or CLI verb for deletion — replacing via `:::edit-warm-hook` covers the common case, and outright removal is rare enough to live in the dashboard.
 
 After save, acknowledge per rule 10 (link to `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`, CTA naming warm pool).
 
@@ -341,7 +342,6 @@ replicas environment files delete <env> <path-or-id> [--force]
 # Warm hooks / pools
 replicas environment warm-hook get <env>
 replicas environment warm-hook set <env> --script <path>           # or --script - / --inline "..."
-replicas environment warm-hook clear <env>
 replicas environment warm-hook test <env> --script <path>          # or --use-current; streams sandbox output
 replicas environment warm-pool get <env>
 replicas environment warm-pool enable <env> | disable <env>
