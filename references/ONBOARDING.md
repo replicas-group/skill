@@ -101,7 +101,7 @@ Branches by what `replicas environment list` and `replicas repos list` returned:
 - **Default env exists for the only repo** → Use the orientation above. If they keep Default, treat the env step as done and close with the rule-10 CTA. If they want a separate one, fall through to the next case.
 - **No env yet for the repo** → Same orientation, but swap the second paragraph for: *"Proposing `<name>` bound to `<owner>/<repo>`."* (auto-derived: `acme/api` → `acme-api`, lowercase, no spaces). Then immediately emit `:::confirm-action` with `kind: create_environment`, `summary: Create environment \`<name>\` bound to \`<owner>/<repo>\``, `command: replicas environment create <name> --repository <owner>/<repo>`.
 
-After approval, acknowledge per rule 10 (link to `https://tryreplicas.com/dashboard/environment/<id>`, CTA naming env vars).
+After approval, acknowledge per rule 10 (link to `https://tryreplicas.com/dashboard/environment/<id>?tab=configuration`, CTA naming env vars).
 
 **Edge cases**
 - Name collision → suggest a suffix and emit a new confirm-action.
@@ -113,7 +113,7 @@ Run `replicas environment vars list <env>` silently. One short line stating what
 
 Do NOT suggest key names. Only the user knows which keys they need. Omit `suggested_name` unless the user named a specific key in chat ("I need CLAUDE_API_KEY and S3_API_KEY"). When they do, emit one block with `suggested_name` for one of the keys.
 
-The synthetic save reply will be `Saved <keys> to <env>.` or `Saved N variables (k1, k2, …) to <env>.`. Acknowledge per rule 10 (link to `https://tryreplicas.com/dashboard/environment/<env-id>?tab=variables`, CTA: **Add another, or click `Walk me through this step` below for warm hooks?**). Next step is `warm-hook`.
+The synthetic save reply will be `Saved <keys> to <env>.`, `Saved N variables (k1, k2, …) to <env>.`, or `Wrote file <path> to <env>.`. Acknowledge per rule 10 with the tab that has the change: `?tab=variables` for variable saves, `?tab=files` for env-file saves. CTA: **Add another, or click `Walk me through this step` below for warm hooks?** Next step is `warm-hook`.
 
 **Edge cases**
 - User pastes a secret in chat → don't echo it. "Use the form below." Emit a fresh `:::secure-input`.
@@ -291,11 +291,26 @@ Only emit for optional steps (`warm-hook`, `warm-pool`, `automations`, `integrat
 
 ## Dashboard URLs
 
-- Environment: `https://tryreplicas.com/dashboard/environment/<id>` (append `?tab=variables`, `?tab=files`, `?tab=skills`, `?tab=mcps`, `?tab=warm-hooks`)
+**Acknowledgment links must be tab-precise** — always land the user on the exact tab that shows the change they just made, not the env's default tab. Pick the right `?tab=` from the table below.
+
+| Change | URL |
+| --- | --- |
+| Env created or edited | `https://tryreplicas.com/dashboard/environment/<id>?tab=configuration` |
+| Variable created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<id>?tab=variables` |
+| Env file created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<id>?tab=files` |
+| Skill added | `https://tryreplicas.com/dashboard/environment/<id>?tab=skills` |
+| MCP added | `https://tryreplicas.com/dashboard/environment/<id>?tab=mcps` |
+| Warm hook (per-env) | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` |
+| Warm hook (global) | `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` |
+| Warm pool toggled | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` (the same tab — labeled "Warm Hooks & Pools" on the per-env page) |
+| Automation created/edited | `https://tryreplicas.com/dashboard/automations/<automation-id>` |
+| Integration connected | `https://tryreplicas.com/dashboard/integrations` |
+
+Other useful pages (not tied to a specific acknowledgment):
+
 - Environments list: `https://tryreplicas.com/dashboard/environment`
-- Automations: `https://tryreplicas.com/dashboard/automations`
+- Automations list: `https://tryreplicas.com/dashboard/automations`
 - Repositories: `https://tryreplicas.com/dashboard/github`
-- Integrations: `https://tryreplicas.com/dashboard/integrations`
 - Agent credentials: `https://tryreplicas.com/dashboard/agents`
 - Org settings (admins): `https://tryreplicas.com/dashboard/preferences`
 
