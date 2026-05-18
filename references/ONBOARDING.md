@@ -123,9 +123,14 @@ The synthetic save reply will be `Saved <keys> to <env>.` or `Saved N variables 
 
 ### `warm-hook` (optional)
 
-Open with framing plus a few common scripts so the user has a starting point:
+Open with framing plus a few common scripts so the user has a starting point. Always explain the two-tier hierarchy so they know what they're editing:
 
-> A **warm hook** is a bash script that runs once when a workspace provisions. Without one, every fresh workspace re-runs setup from scratch and takes a minute or two longer to be useful. Good for:
+> A **warm hook** is a bash script that runs once when a workspace provisions. Two tiers:
+>
+> - **Global warm hook** — runs in every workspace across every environment. Good for shared setup that applies everywhere.
+> - **Per-environment warm hook** — runs *after* the global one, in workspaces bound to a specific environment. Good for more specialized setup (a build cache for one repo, a specific registry login, etc.).
+>
+> Without warm hooks, every fresh workspace re-runs setup from scratch and takes a minute or two longer to be useful. Common uses:
 >
 > - **Installing deps** — `bun install`, `pnpm install`, `pip install -r requirements.txt`
 > - **Priming caches** — warm a build cache or download model weights
@@ -134,14 +139,21 @@ Open with framing plus a few common scripts so the user has a starting point:
 >
 > **Want one of those, your own script, or skip?**
 
-Default the environment to the one from step 1. Branches:
+Default the environment to the one from step 1. If the user's request is shared infrastructure (deps everyone needs, common cache), suggest the **global** env so it applies everywhere; if it's specific to one repo or workflow, use the **per-environment** target.
+
+Branches:
 
 - **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** that's only enabled after a passing test. The script body must come strictly from what the user said in chat (or one of the listed examples they picked); if they're vague, ask one short clarifier first. Synthetic reply on save: `Saved warm hook for <env>.`.
 - **Skip** → emit `:::onboarding-advance from: warm-hook to: warm-pool`.
 
 If the user wants to **remove an existing warm hook entirely** (not replace it with a different script), point them at the dashboard: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`. There's no chat block or CLI verb for deletion — replacing via `:::edit-warm-hook` covers the common case, and outright removal is rare enough to live in the dashboard.
 
-After save, acknowledge per rule 10 (link to `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`, CTA naming warm pool).
+After save, acknowledge per rule 10 — but always surface **both** dashboard URLs so the user knows where each tier lives. The global env uses the literal `global` path segment (not a UUID); for the per-env URL use the env's actual UUID, which you can get from `replicas environment list` if you don't have it.
+
+- The global warm hook page: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` — applies to every workspace.
+- The just-saved env's warm hook page: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` — applies only to workspaces bound to this env, and runs after the global one.
+
+Reiterate the hierarchy in one short sentence ("Global runs first, then this env's hook layers on top") so the relationship is clear. Then the CTA naming warm pool.
 
 **When a test fails**, you'll get a synthetic chat reply of the form `Warm hook test failed (exit N) on <env>.` (or `timed out`) with a fenced ```` ``` ```` block of the sandbox output and the line `What should I change in the script?`. Read the output, diagnose the failure, and **emit a new `:::edit-warm-hook` block** with a fixed script. Brief one-line lead-in is fine (e.g. "Looks like there's no `package.json` in the repo — dropping the `bun install` line."), then the block. Don't propose changes only in prose — the user expects a fresh block they can re-test.
 

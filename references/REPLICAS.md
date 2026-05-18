@@ -172,7 +172,21 @@ Repos are connected via the GitHub integration in the dashboard — not from the
 
 ## `replicas.json` / `replicas.yaml`
 
-`replicas init` creates a starter config in the current directory. `-y` writes YAML, `-f` overwrites an existing file. This file controls per-repo workspace setup (warm hooks, start hooks, organization scoping for GitHub triggers). When the user asks to "set up Replicas in this repo", run `replicas init` and then edit the generated file based on what they need.
+`replicas init` creates a starter config in the current directory. `-y` writes YAML, `-f` overwrites an existing file. This file is for **per-repo overrides** that live in the repo itself, not in the org's Replicas settings.
+
+What it's actually required for:
+
+- **GitHub triggers (automations).** The GitHub App reads automation mappings from the committed file, so triggers don't fire until `replicas.json` (or `.yaml`) is committed to the repo's default branch.
+- **Per-repo warm hook commands.** If a repo declares a `warmHook` field, the engine runs those commands *after* the env-level warm hook in that repo's cwd. Optional override — most users don't need it.
+- **Per-repo start hook**, organization scoping, and a handful of other repo-local settings.
+
+What it's **not** required for:
+
+- **Env-level warm hooks** — set via `replicas env warm-hook set` or the dashboard. Stored in the DB and run on every warm sandbox regardless of whether any repo has a `replicas.yaml`.
+- **Warm pools** — the pool primes sandboxes using the env-level warm hook. No repo file needed.
+- **Environment variables, files, skills, MCPs, integrations** — all managed at the org/env level, not in the repo.
+
+When the user asks to "set up Replicas in this repo", run `replicas init` and then edit the generated file based on what they need. If they're asking about warm hooks, env vars, or anything else that lives at the env level, don't push them toward the repo file — use the right CLI verb instead.
 
 ## When NOT to use the CLI
 
