@@ -11,7 +11,7 @@ echo "${SLACK_BOT_TOKEN:+set}"
 ```
 
 - If **set**: Your workspace has Slack access. You can use the Slack Web API as described below.
-- If **not set**: Slack has not been configured for this workspace. The user needs to connect Slack in the [Replicas dashboard](https://replicas.dev) under their organization's integration settings. Let the user know and do not attempt Slack operations.
+- If **not set**: Slack has not been configured for this workspace. The user needs to connect Slack in the [Replicas dashboard](https://www.tryreplicas.com) under their organization's integration settings. Let the user know and do not attempt Slack operations.
 
 ## Using the Slack API
 

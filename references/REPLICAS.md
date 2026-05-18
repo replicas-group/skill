@@ -2,7 +2,7 @@
 
 This guide covers how to take action *with* Replicas itself from inside a Replicas workspace — managing automations, environments (and their variables/files), repos, previews, and the user's `replicas.json` config — using the pre-installed `replicas` CLI.
 
-When the user asks _about_ Replicas (concepts, pricing, how a feature works), check https://docs.replicas.dev first. When the user asks you to _do_ something in their Replicas org, this is the file to use.
+When the user asks _about_ Replicas (concepts, pricing, how a feature works), check https://docs.tryreplicas.com first. When the user asks you to _do_ something in their Replicas org, this is the file to use.
 
 ## Prerequisites
 

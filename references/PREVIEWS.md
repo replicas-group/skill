@@ -40,10 +40,10 @@ The `create` command prints the public URL. You can also read all active preview
 
 ## Authenticated vs Unauthenticated Previews
 
-Previews can optionally require cookie-based authentication. When `--authenticated` is set, only users who are logged in to replicas.dev can access the preview.
+Previews can optionally require cookie-based authentication. When `--authenticated` is set, only users who are logged in to tryreplicas.com can access the preview.
 
 **When to use `--authenticated`:**
-- Frontends / web apps that humans will view directly in their browser. Since the user is already logged in to replicas.dev, the auth cookie is automatically present and the preview works seamlessly.
+- Frontends / web apps that humans will view directly in their browser. Since the user is already logged in to tryreplicas.com, the auth cookie is automatically present and the preview works seamlessly.
 
 **When NOT to use `--authenticated`:**
 - Backend APIs and other services that are called by frontend code. The frontend runs in the user's browser under a different origin, so it cannot forward the Replicas auth cookie to the backend. Making backends authenticated will cause cross-service requests to fail with 401 errors.

@@ -94,4 +94,4 @@ Use this when:
 - The user asks "what envs / repos / automations do I have?"
 - The user asks you to scaffold a `replicas.json` / `replicas.yaml` in a repo
 
-For *questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.replicas.dev first and only fall back to this skill when the user is asking you to take an action.
+For *questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first and only fall back to this skill when the user is asking you to take an action.

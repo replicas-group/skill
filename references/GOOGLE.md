@@ -15,7 +15,7 @@ curl -s -X GET "$MONOLITH_URL/v1/gdrive/credentials" \
 ```
 
 - If `hasCredentials` is `true`: you're good to go.
-- If `hasCredentials` is `false`: Google has not been connected for this org. Ask the user to go to **Settings → Integrations → Google** in the [Replicas dashboard](https://replicas.dev) and connect a Google account. Do not attempt Google operations until it's connected.
+- If `hasCredentials` is `false`: Google has not been connected for this org. Ask the user to go to **Settings → Integrations → Google** in the [Replicas dashboard](https://www.tryreplicas.com) and connect a Google account. Do not attempt Google operations until it's connected.
 
 Standard auth headers used by every call below:
 
