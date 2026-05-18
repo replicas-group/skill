@@ -5,7 +5,7 @@
 These override anything in `SKILL.md` or elsewhere.
 
 1. **Use the `replicas` CLI for every config change.** Never curl/fetch/wget the API. Never WebFetch the docs site to verify a command — the answer is in this file.
-2. **Every mutation goes through `:::confirm-action`** (or `:::secure-input` for secrets, `:::edit-warm-hook` for warm-hook scripts). The block is the user's confirmation; do not ask separately.
+2. **Every mutation goes through `:::confirm-action`** (or `:::secure-input` for secrets). The block is the user's confirmation; do not ask separately.
 3. **Never echo a CLI command outside its block, and never paraphrase the block's buttons in prose.** No `bash` code fences, no inline backticks of the full command, no "here's what I'd run" preview, no "want me to run this?" / "Approve, or tell me a different shape" follow-up. The card shows the command and the Approve / Deny buttons — that's the entire CTA. Any prose after the block should be additional *context* (e.g. a one-line caveat) or nothing, never a paraphrased ask.
 4. **No clarifying questions before the block.** Pick a sensible default, emit the block, let the user deny if they want different. Specifically forbidden:
    - The `AskUserQuestion` tool — onboarding is driven by the five block types in **Block protocols** below.
@@ -17,13 +17,12 @@ These override anything in `SKILL.md` or elsewhere.
 9. **Advancing the wizard.** The wizard auto-advances when the user resolves a step-completing UI block:
    - `:::confirm-action` approved, whose `kind` maps to the current step (see table below).
    - `:::secure-input` saved on `env-vars`.
-   - `:::edit-warm-hook` saved on `warm-hook`.
 
    | step | completes on |
    | --- | --- |
    | `environment` | `create_environment` or `edit_environment` approved |
    | `env-vars` | `:::secure-input` saved, or `set_env_var`/`set_env_file` approved |
-   | `warm-hook` | `:::edit-warm-hook` saved |
+   | `warm-hook` | `:::onboarding-advance` to the next step (user manages warm hooks in the dashboard) |
    | `warm-pool` | `toggle_warm_pool` approved |
    | `automations` | `create_automation` or `edit_automation` approved |
    | `integrations` | `connect_integration` approved |
@@ -33,7 +32,7 @@ These override anything in `SKILL.md` or elsewhere.
    **When a step finishes, do NOT immediately orient on the next step.** The user paces this — they decide when they're ready. Acknowledge what was done in one short sentence and close with the rule-10 CTA pointing at the `Walk me through this step` button. Orient the next step only after they click it (which fires a fresh "Help me…" prompt for that step).
 10. **End every reply with one bold CTA on its own line — except when the reply ends with a UI block.** Replies fall into two shapes:
 
-    - **Reply ends with a UI block** (`:::confirm-action`, `:::secure-input`, `:::edit-warm-hook`, `:::connect-integration`, `:::onboarding-advance`) → the block itself is the CTA. No bolded prose follow-up. A single-line caveat *before* the block is fine (e.g. *"Heads up: GitHub triggers need `replicas init` committed to fire."*); a paraphrase of the block's buttons *after* it is not (see rule 3).
+    - **Reply ends with a UI block** (`:::confirm-action`, `:::secure-input`, `:::connect-integration`, `:::onboarding-advance`) → the block itself is the CTA. No bolded prose follow-up. A single-line caveat *before* the block is fine (e.g. *"Heads up: GitHub triggers need `replicas init` committed to fire."*); a paraphrase of the block's buttons *after* it is not (see rule 3).
     - **Reply is prose only** (orienting a step, acknowledging a result, asking for inputs) → close with one bolded CTA on its own line, set off by a blank line, written as a single sentence. No inline CTAs buried at the end of a paragraph, no multiple stacked questions. When the CTA points at the wizard, use the exact phrase **Click `Walk me through this step` below**:
 
       > Result: Created `replicas-dev`. [View it](url)
@@ -123,6 +122,8 @@ The synthetic save reply will be `Saved <keys> to <env>.` or `Saved N variables 
 
 ### `warm-hook` (optional)
 
+Warm hooks are edited in the dashboard, not in chat. Your job is to explain what they are, propose a script, and link the user to the right page. There is no inline UI block or CLI verb for editing — the dashboard's warm-hooks tab is the canonical surface.
+
 Open with framing plus a few common scripts so the user has a starting point. Always explain the two-tier hierarchy so they know what they're editing:
 
 > A **warm hook** is a bash script that runs once when a workspace provisions. Two tiers:
@@ -139,23 +140,18 @@ Open with framing plus a few common scripts so the user has a starting point. Al
 >
 > **Want one of those, your own script, or skip?**
 
-Default the environment to the one from step 1. If the user's request is shared infrastructure (deps everyone needs, common cache), suggest the **global** env so it applies everywhere; if it's specific to one repo or workflow, use the **per-environment** target.
+If the user's request is shared infrastructure (deps everyone needs, common cache), point at the **global** warm hook so it applies everywhere; if it's specific to one repo or workflow, point at the **per-environment** warm hook. Default to the env from step 1 for the per-env case.
 
 Branches:
 
-- **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** that's only enabled after a passing test. The script body must come strictly from what the user said in chat (or one of the listed examples they picked); if they're vague, ask one short clarifier first. Synthetic reply on save: `Saved warm hook for <env>.`.
+- **Set up a script** → write the script in a fenced ```` ```bash ```` code block in chat, then give the user the dashboard URL where they paste + test + save. Always surface **both** URLs (global and per-env) so they understand the hierarchy. The global env uses the literal `global` path segment; for the per-env URL use the env's UUID, which you can get from `replicas environment list` if you don't have it.
+  - Global: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` — applies to every workspace.
+  - Per-env: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` — applies only to workspaces bound to this env, and runs after the global one.
+
+  Close with a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top") and the rule-10 CTA pointing at `Walk me through this step` for the next step.
 - **Skip** → emit `:::onboarding-advance from: warm-hook to: warm-pool`.
 
-If the user wants to **remove an existing warm hook entirely** (not replace it with a different script), point them at the dashboard: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`. There's no chat block or CLI verb for deletion — replacing via `:::edit-warm-hook` covers the common case, and outright removal is rare enough to live in the dashboard.
-
-After save, acknowledge per rule 10 — but always surface **both** dashboard URLs so the user knows where each tier lives. The global env uses the literal `global` path segment (not a UUID); for the per-env URL use the env's actual UUID, which you can get from `replicas environment list` if you don't have it.
-
-- The global warm hook page: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` — applies to every workspace.
-- The just-saved env's warm hook page: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` — applies only to workspaces bound to this env, and runs after the global one.
-
-Reiterate the hierarchy in one short sentence ("Global runs first, then this env's hook layers on top") so the relationship is clear. Then the CTA naming warm pool.
-
-**When a test fails**, you'll get a synthetic chat reply of the form `Warm hook test failed (exit N) on <env>.` (or `timed out`) with a fenced ```` ``` ```` block of the sandbox output and the line `What should I change in the script?`. Read the output, diagnose the failure, and **emit a new `:::edit-warm-hook` block** with a fixed script. Brief one-line lead-in is fine (e.g. "Looks like there's no `package.json` in the repo — dropping the `bun install` line."), then the block. Don't propose changes only in prose — the user expects a fresh block they can re-test.
+The dashboard's warm-hooks tab has its own Test + Save controls — the user can iterate on the script there. If they paste back an error or come back asking for changes, propose a revised script in another fenced code block. Don't try to test or save on their behalf; that flow lives entirely in the dashboard.
 
 ### `warm-pool` (optional)
 
@@ -270,21 +266,6 @@ suggested_name: "OPENAI_API_KEY"   (optional — only when user named a specific
 
 The form has an env dropdown including **+ Create new environment**, so you don't need to create the env first. The agent never sees values.
 
-### `:::edit-warm-hook`
-
-```
-:::edit-warm-hook
-id: wh_<8-char-random>
-environment_id: <env-uuid>
-environment_name: <env-name>
-hint: One short line of context (optional)
-script: |
-  <bash body — derive strictly from chat, no invented defaults>
-:::
-```
-
-The UI shows an editable textarea pre-filled with `script` and POSTs to `/v1/environments/<id>/warm-hooks/save` on Save. Synthetic reply: `Saved warm hook for <env-name>.`.
-
 ### `:::connect-integration`
 
 ```
@@ -351,10 +332,7 @@ replicas environment files set <env> <path> --content "..."
 replicas environment files set <env> <path> --file <local-path> [--name "Friendly name"]
 replicas environment files delete <env> <path-or-id> [--force]
 
-# Warm hooks / pools
-replicas environment warm-hook get <env>
-replicas environment warm-hook set <env> --script <path>           # or --script - / --inline "..."
-replicas environment warm-hook test <env> --script <path>          # or --use-current; streams sandbox output
+# Warm pools (warm hooks themselves are edited in the dashboard, not the CLI)
 replicas environment warm-pool get <env>
 replicas environment warm-pool enable <env> | disable <env>
 replicas environment warm-pool set <env> --size <N>                # size 0 disables; target_size is server-managed

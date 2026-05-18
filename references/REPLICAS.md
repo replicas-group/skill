@@ -182,11 +182,11 @@ What it's actually required for:
 
 What it's **not** required for:
 
-- **Env-level warm hooks** — set via `replicas env warm-hook set` or the dashboard. Stored in the DB and run on every warm sandbox regardless of whether any repo has a `replicas.yaml`.
-- **Warm pools** — the pool primes sandboxes using the env-level warm hook. No repo file needed.
+- **Env-level warm hooks** — edited in the dashboard at `https://tryreplicas.com/dashboard/environment/<env-id-or-global>?tab=warm-hooks`. Stored in the DB and run on every warm sandbox regardless of whether any repo has a `replicas.yaml`. There is no CLI verb for editing the env-level warm hook; propose the script in chat and point the user at the URL.
+- **Warm pools** — the pool primes sandboxes using the env-level warm hook. No repo file needed. Pool size is managed via `replicas environment warm-pool` CLI.
 - **Environment variables, files, skills, MCPs, integrations** — all managed at the org/env level, not in the repo.
 
-When the user asks to "set up Replicas in this repo", run `replicas init` and then edit the generated file based on what they need. If they're asking about warm hooks, env vars, or anything else that lives at the env level, don't push them toward the repo file — use the right CLI verb instead.
+When the user asks to "set up Replicas in this repo", run `replicas init` and then edit the generated file based on what they need. If they're asking about warm hooks (env-level), env vars, or anything else that lives at the env level, don't push them toward the repo file — use the right CLI verb or, for warm hooks, the dashboard URL.
 
 ## When NOT to use the CLI
 
