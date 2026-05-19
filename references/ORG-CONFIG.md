@@ -1,6 +1,8 @@
 # Replicas Org Configuration
 
-When a user asks to set up, modify, or troubleshoot their Replicas org config — environments, env vars, env files, warm pools, warm hooks, skills, MCPs, integrations, automations — use this guide. It applies in **any** workspace (not just onboarding). For the onboarding-wizard-specific layer (step order, `:::onboarding-advance`, walk-me-through CTA), see `ONBOARDING.md`.
+When a user asks to set up, modify, or troubleshoot their Replicas org config — environments, env vars, env files, warm pools, warm hooks, skills, MCPs, integrations, automations — use this guide. It applies in **any** workspace, including onboarding.
+
+There is no separate "onboarding behavior" for these capabilities. The same blocks, the same playbooks, the same dashboard URLs in both contexts. The difference between an onboarding workspace and a regular one is **state**, not behavior — in onboarding nothing is set up yet; in a regular workspace, things are. Adapt to the state you discover, not to which workspace you're in. The only onboarding-specific concerns (wizard step order, the `Walk me through` CTA, `:::onboarding-advance`) live in `ONBOARDING.md`.
 
 ## Hard rules
 
@@ -25,9 +27,17 @@ When a user asks to set up, modify, or troubleshoot their Replicas org config �
 - Action-first. No lectures.
 - If the user declines, drop it and move on.
 
-## Capability playbooks
+## Adapt to state
 
-For each capability the user might ask about, run any relevant read-only commands first (`replicas environment list`, `replicas automation list`, `replicas repos list`) so you know what already exists. Read-only commands skip `:::confirm-action`.
+Before every capability playbook, discover the current state silently with read-only commands (`replicas environment list`, `replicas environment vars list <env>`, `replicas automation list`, etc.) and adapt:
+
+- **Nothing set up yet** (typical in onboarding, or a fresh workspace) → orient the user with the full jot-note framing from rule 8. Define the concept, surface the why, then act.
+- **Already set up** → acknowledge what's there in one line, then act on the user's specific ask. Don't re-orient them on the concept; they're past that.
+- **Default the env.** If the workspace is bound to an env (`workspace.environment_id`), every action defaults to that env. Don't ask the user to pick or create one unless they raise it themselves.
+
+Read-only discovery commands skip `:::confirm-action`.
+
+## Capability playbooks
 
 ### Environments
 
@@ -60,7 +70,7 @@ After approval, acknowledge per rule 9 (link to `https://tryreplicas.com/dashboa
 - Name collision → suggest a suffix and emit a new confirm-action.
 - No agent credential → "Connect Claude or Codex at [the agents page](https://tryreplicas.com/dashboard/agents) first (admin-only)." Stop.
 
-### Configuration (pointer)
+### Configuration
 
 The configuration tab is where the user tunes an env's settings: system prompt, repo binding, name, description. Most edits are one-off and easier to do with the dashboard form. **Don't try to walk them through editing the system prompt in chat — link them to the tab.**
 
@@ -107,7 +117,7 @@ Branches:
 
 After approval, acknowledge per rule 9 (link to `?tab=warm-hooks`).
 
-### Warm hook (pointer)
+### Warm hook
 
 Warm hooks are edited in the dashboard, not in chat. Your job is to explain what they are, propose a script as a fenced code block, and link the user to the right page. There is no inline UI block or CLI verb for editing — the dashboard's warm-hooks tab is the canonical surface.
 
@@ -137,21 +147,18 @@ Branches:
 
 The dashboard's warm-hooks tab has Test + Save controls — the user iterates there. If they paste back an error or come back asking for changes, propose a revised script in another fenced code block. Don't try to test or save on their behalf.
 
-### Skills & MCPs (pointer)
+### Skills & MCPs
 
-Both extend what an agent can do. They live on their own dashboard tabs and aren't managed via the CLI or chat — point users at the dashboard and explain the concepts.
+Both extend what an agent can do, per-environment.
 
-> Two ways to extend an agent's capabilities, both per-environment:
->
-> - **Skills** — pre-packaged playbooks the agent can load on demand (a "PR review skill" the agent loads when asked to review PRs, a "Linear triage skill", etc.). Browseable catalog.
-> - **MCPs** — external tools the agent can call (a Postgres MCP that lets it query a DB, a Slack MCP that lets it post messages, etc.). Tool-shaped capabilities.
+> - **Skills** — pre-packaged playbooks the agent can load on demand (a "PR review skill", a "Linear triage skill"). One-click add from the recommended catalog.
+> - **MCPs** — external tools the agent can call (Postgres, Notion, Atlassian). Need provider secrets, so configured in the dashboard.
 
-Link them at:
+Emit `:::add-skills-mcps` with `environment_id` + `environment_name`. The UI fetches the recommended skills catalog server-side and shows the top picks with checkboxes; MCPs render as cards linking to the dashboard's MCPs tab (since they need secrets). The user picks skills + clicks Add.
 
-- Skills: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=skills`
-- MCPs: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=mcps`
+Synthetic save reply: `Added skill <name> to <env>.` or `Added N skills (<names>) to <env>.`. Acknowledge per rule 9 (link to `?tab=skills` — note that the per-skill add response goes to that tab; for MCPs the user already navigated via the card link).
 
-No CLI verb for either. Editing one is a dashboard operation.
+If the user wants MCPs configured for them (rare — they'd have to volunteer the secrets), guide them to the dashboard tab. Do not collect MCP secrets via secure-input — that flow only saves to env vars, not MCP config.
 
 ### Integrations
 
@@ -168,31 +175,24 @@ When the user picks one or more, emit `:::connect-integration` with `provider: s
 **Edge cases**
 - Member, not admin → integrations are admin-only on the credentials side. Members can use already-connected integrations but can't connect new ones. Route them to an admin.
 
-### Automations (pointer with optional confirm-action)
+### Automations
 
 An automation is an agent that runs on its own when something fires. Each run spins up a fresh workspace, executes a prompt, and ships work back (commits, PRs, messages) without you in the loop.
 
-> **Examples** (steal one or adapt):
->
-> - **PR quality** — "Lint and flag unused exports on every PR"
-> - **Error triage** — "Triage new Sentry errors into Linear tickets every weekday morning"
-> - **Slack ops** — "Reply to @mentions of @replicas in #engineering"
-> - **Release checks** — "Run smoke tests on every push to main and post results in #releases"
+**Default to templates.** Emit `:::automation-templates` with `environment_id` + `environment_name`. The UI shows 4 curated starter templates (Lint PRs, Sentry triage, Slack @-mention reply, daily smoke tests). The user picks one and the automation is created directly via the API.
 
-The dashboard's automations page is the richer surface — visual trigger picker, prompt history, run logs. Point users there first: `https://tryreplicas.com/dashboard/automations`.
+Synthetic save reply: `Created automation <name> in <env>.`. Acknowledge per rule 9 (link to `https://tryreplicas.com/dashboard/automations/<id>`).
 
-If the user has all three pieces clear (trigger + prompt + name), you can emit `:::confirm-action` with `kind: create_automation`, `command: replicas automation create "<name>" --prompt "<prompt>" --environment <env> <trigger flags>`.
+**Custom automation.** If the user wants something not in the templates (cron at a specific time with a custom prompt, a Linear trigger, etc.), gather trigger + prompt + name first, then emit `:::confirm-action` with `kind: create_automation`, `command: replicas automation create "<name>" --prompt "<prompt>" --environment <env> <trigger flags>`. The richer dashboard page (visual trigger picker, prompt history, run logs) is at `https://tryreplicas.com/dashboard/automations` if they want a GUI.
 
-**Trigger flag shapes**
+**Trigger flag shapes** (for the custom-confirm-action path)
 - Cron → `--trigger-cron "0 9 * * *" --trigger-cron-timezone "America/Los_Angeles"`
 - GitHub → `--trigger-github pull_request.opened --trigger-github-repos <owner>/<repo>`
 - High-volume (every PR) → add `--lifecycle delete_when_done`
 
-After approval, acknowledge per rule 9 (link to `https://tryreplicas.com/dashboard/automations/<id>`).
-
 **Edge cases**
 - No env yet → walk them through the environment playbook first.
-- GitHub trigger without `replicas.json` in the repo → before the `:::confirm-action` block, add a one-line caveat such as *"Heads up: GitHub triggers need `replicas init` committed to the repo to fire — the automation will save fine but won't actually run until that's in."* Then the block.
+- GitHub trigger without `replicas.json` in the repo → before the block (template card or confirm-action), add a one-line caveat such as *"Heads up: GitHub triggers need `replicas init` committed to the repo to fire — the automation will save fine but won't actually run until that's in."*
 
 ## Block protocols
 
@@ -241,6 +241,30 @@ provider: slack | linear | sentry
 ```
 
 One block per provider. The UI renders the same Connect button as the integrations dashboard (admin-gated, OAuth popup, status-aware).
+
+### `:::add-skills-mcps`
+
+```
+:::add-skills-mcps
+environment_id: <env-uuid>
+environment_name: <env-name>
+hint: One short line of context (optional)
+:::
+```
+
+The UI fetches the recommended skills catalog from the server and renders multi-select checkboxes. MCPs render as separate cards linking to the dashboard's MCPs tab (they need secrets). Save adds the picked skills via the existing skill API.
+
+### `:::automation-templates`
+
+```
+:::automation-templates
+environment_id: <env-uuid>
+environment_name: <env-name>
+hint: One short line of context (optional)
+:::
+```
+
+The UI shows 4 starter templates (Lint PRs, Sentry triage, Slack @-mention reply, daily smoke). Each has a "Use this" button that creates the automation directly via the API. For custom automations (different trigger, different prompt), use `:::confirm-action create_automation` instead.
 
 ## Dashboard URLs
 
