@@ -109,8 +109,6 @@ After approval, acknowledge per rule 9 (link to `?tab=warm-hooks`).
 
 ### Warm hook
 
-Warm hooks are edited in the dashboard, not in chat. Your job is to explain what they are, propose a script as a fenced code block, and link the user to the right page. There is no inline UI block or CLI verb for editing — the dashboard's warm-hooks tab is the canonical surface.
-
 Two-tier hierarchy:
 
 > A **warm hook** is a bash script that runs once when a workspace provisions. Two tiers:
@@ -125,16 +123,18 @@ Two-tier hierarchy:
 > - **Private-registry login** — `gh auth login --with-token < ~/.token`
 > - **Pre-pulling images** — `docker pull <internal-image>`
 
-If the user's request is shared infrastructure (deps everyone needs, common cache), point at the **global** warm hook so it applies everywhere; if it's specific to one repo or workflow, point at the **per-environment** warm hook.
+If the user's request is shared infrastructure (deps everyone needs, common cache), default to the **global** warm hook so it applies everywhere; if it's specific to one repo or workflow, default to the **per-environment** warm hook.
 
-**Set up a script** → write the script in a fenced ```` ```bash ```` code block in chat, then surface **both** URLs (global and per-env). The global env uses the literal `global` path segment; for the per-env URL use the env's UUID.
+Branches:
 
-- Global: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` — applies to every workspace.
-- Per-env: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` — applies only to workspaces bound to this env, and runs after the global one.
+- **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** that's only enabled after a passing test. The script body must come strictly from what the user said in chat (or one of the example uses above, if they picked one); if they're vague, ask one short clarifier first. Synthetic save reply: `Saved warm hook for <env>.`.
+- **Just browse / iterate manually** → point them at the dashboard tabs. Both URLs:
+  - Global: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks`
+  - Per-env: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`
 
-Close with a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top") and the rule-9 CTA.
+**When a test fails**, you'll get a synthetic chat reply of the form `Warm hook test failed (exit N) on <env>.` (or `timed out`) with a fenced sandbox-output code block and the line `What should I change in the script?`. Read the output, diagnose, and **emit a new `:::edit-warm-hook` block** with a fixed script. Brief one-line lead-in is fine (e.g. *"Looks like there's no `package.json` in the repo — dropping the `bun install` line."*); don't propose changes in prose without re-emitting the block.
 
-The dashboard's warm-hooks tab has Test + Save controls — the user iterates there. If they paste back an error or come back asking for changes, propose a revised script in another fenced code block. Don't try to test or save on their behalf.
+After save, acknowledge per rule 9 with the warm-hooks tab URL and a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top").
 
 For per-repo warm-hook commands (an extra tier that runs after the env-level hook, in the repo's cwd) see the `replicas.json` section in `REPLICAS.md`.
 
@@ -189,6 +189,21 @@ hint: One short line of context (optional)
 
 The UI fetches the recommended skills catalog from the server and renders multi-select checkboxes. MCPs render as separate cards linking to the dashboard's MCPs tab (they need secrets). Save adds the picked skills via the existing skill API.
 
+### `:::edit-warm-hook`
+
+```
+:::edit-warm-hook
+id: wh_<8-char-random>
+environment_id: <env-uuid>
+environment_name: <env-name>
+hint: One short line of context (optional)
+script: |
+  <bash body — derive strictly from chat, no invented defaults>
+:::
+```
+
+The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<id>/warm-hooks/save` and sends back the synthetic reply `Saved warm hook for <env-name>.`. On test failure, the UI sends back a `Warm hook test failed (exit N) on <env>.` reply with the sandbox output in a fenced code block — re-emit a new `:::edit-warm-hook` with a fixed script in response.
+
 ## CLI reference
 
 ### Environments
@@ -227,9 +242,17 @@ replicas environment files delete <env> <path-or-id> [--force]
 
 Each file is capped at 64KB. `set` is upsert (matched by destination path).
 
-### Warm pools
+### Warm hooks (CLI)
 
-Warm hooks themselves are edited in the dashboard (no CLI verb). The CLI manages pool toggle + size:
+```bash
+replicas environment warm-hook get <env>
+replicas environment warm-hook set <env> --script <path>     # or --script - / --inline "..."
+replicas environment warm-hook test <env> --script <path>    # or --use-current; streams sandbox output
+```
+
+The inline `:::edit-warm-hook` block is the recommended path for in-chat editing (Test + Save with a passing-test gate). The CLI verbs are for scripting, one-shot edits from a known-good file on disk, or replaying a previously-saved hook into a dry-run via `--use-current`.
+
+### Warm pools
 
 ```bash
 replicas environment warm-pool get <env>
