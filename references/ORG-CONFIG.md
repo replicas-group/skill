@@ -54,8 +54,8 @@ For env-specific capabilities (env vars, files, warm-pool, warm-hook, skills/MCP
 Three integrations unlock different shapes of automation.
 
 > - **Slack** — @-mention the agent in any channel to start a workspace; replies ship back to the same thread.
-> - **Linear** — automations pick up tickets as they're created or assigned and can open PRs against them.
-> - **Sentry** — automations trigger on new errors and investigate the regression.
+> - **Linear** — @-mention the agent on a ticket to start a workspace; the agent can also read and write Linear (pull ticket context, comment, update status, open PRs).
+> - **Sentry** — the agent can read Sentry (errors, stack traces, event data) to investigate regressions.
 >
 > All three are OAuth, ~10 seconds each.
 
