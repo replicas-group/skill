@@ -170,7 +170,7 @@ For the cross-cutting blocks (`:::confirm-action`, `:::connect-integration`, `::
 ```
 :::secure-input
 action: set-env-var | upload-file-to-var | set-env-file
-hint: "What this is for, e.g. 'Keys for replicas-dev'"
+hint: "What this is for, e.g. 'Environment variables for replicas-dev'"
 suggested_name: "OPENAI_API_KEY"   (optional — only when user named a specific key)
 :::
 ```
