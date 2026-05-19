@@ -83,26 +83,47 @@ Use this when:
 - You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
 - You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
 
-### Replicas (in-workspace CLI)
-Take action *with* Replicas itself — manage automations, environments (variables, files), repos, and `replicas.json` config — using the pre-installed, pre-authenticated `replicas` CLI.
+### Replicas CLI (overview)
+The umbrella for the pre-installed, pre-authenticated `replicas` CLI. Prerequisites, `whoami`, `repos`, `replicas.json` / `init`, when-not-to-use, common errors, and an index pointing at topical refs below.
 
 **Reference:** `references/REPLICAS.md`
 
 Use this when:
-- The user asks you to create, edit, run, or delete an automation
-- The user asks you to manage environments, environment variables, or environment files
-- The user asks "what envs / repos / automations do I have?"
-- The user asks you to scaffold a `replicas.json` / `replicas.yaml` in a repo
+- You need to verify auth or list repos
+- The user asks to scaffold a `replicas.json` / `replicas.yaml` in a repo
+- You want to know which topical reference covers a given action
 
-For *general questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first. For taking action (creating/editing/deleting things), use the `replicas` CLI and the references below — never WebFetch in place of running a CLI command.
+For *general questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first. For taking action, use the `replicas` CLI and the topical refs — never WebFetch in place of running a CLI command.
 
-### Onboarding
-Guide users through full Replicas org configuration: environments, automations, integrations, env vars, in dependency order. Includes permission boundaries, secure input handling, the confirm-action approval flow, and first-workspace onboarding.
+### Environments
+Self-contained guide to environments: env vars, env files, warm pool, warm hook, skills, MCPs, configuration. Concepts + CLI + agent-behavior playbooks + env-specific block protocols (`:::secure-input`, `:::add-skills-mcps`) + dashboard URLs + edge cases.
+
+**Reference:** `references/ENVIRONMENT.md`
+
+Use this when:
+- The user asks to create/edit/delete an environment
+- The user asks to add/edit/delete an env variable or env file
+- The user asks about warm pools, warm hooks, skills, or MCPs
+- The user asks about an environment's configuration / system prompt
+- The user asks "what envs / variables / files do I have?"
+
+### Org configuration (non-env)
+Shared agent rules (block emit, secrets, tone, state-adaptation), cross-cutting block protocols (`:::confirm-action`, `:::connect-integration`, `:::automation-templates`), and playbooks for the org-level capabilities that aren't env-bound: integrations and automations.
+
+**Reference:** `references/ORG-CONFIG.md`
+
+Use this when:
+- The user asks to connect Slack, Linear, or Sentry
+- The user asks to create, edit, run, or delete an automation
+- You need the catalog of valid `:::confirm-action` kinds, or any cross-cutting block protocol
+- You need the shared hard rules (no secrets in chat, no clarifying-questions-before-the-block, etc.)
+
+### Onboarding wizard
+Wizard mechanics for the onboarding workspace: step order, the `Walk me through this step` synthetic ask, the `:::onboarding-advance` block, pacing. The agent's behavior in onboarding is the same as in any workspace — the capability playbooks live in `ENVIRONMENT.md` and `ORG-CONFIG.md`; the wizard is just a UI on top.
 
 **Reference:** `references/ONBOARDING.md`
 
 Use this when:
-- The user asks to set up or configure their Replicas org
-- This is the user's first workspace and they need onboarding guidance
-- The user asks what to configure next or how to get started
-- The user asks about integrations, team invites, or GitHub triggers setup
+- The current workspace has `workspace.is_onboarding === true`
+- The user clicks "Walk me through this step" on the wizard accordion
+- You need the onboarding step order or the `:::onboarding-advance` protocol
