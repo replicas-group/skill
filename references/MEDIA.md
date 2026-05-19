@@ -24,7 +24,12 @@ replicas media upload <path-to-file> [<path-to-file> ...]
 
 Pass one or more file paths. Uploading several files in a single invocation is preferred over running the command repeatedly — it's faster and keeps the output grouped.
 
-For each file, the CLI prints a markdown embed line: `![filename](<api-url>)`. After all files are uploaded, it prints a "View in Replicas" line with the workspace media tab URL.
+For each file, the CLI prints two lines:
+
+1. `![filename](<api-url>)` — the chat embed (renders inline in Replicas chat only; see below).
+2. `View in Replicas: <deep-link>` — a per-file dashboard URL of the form `https://tryreplicas.com/workspaces/<workspace-id>?mode=media&media=<media-id>` that opens directly to that specific file.
+
+Match each "View in Replicas" line to the embed line directly above it — that's the deep link for that file.
 
 ## How to use the output
 
@@ -34,28 +39,33 @@ The URL inside `![filename](...)` points at `api.tryreplicas.com/v1/media/<id>`.
 
 **Never paste this URL outside your Replicas chat reply.** Not in Slack messages, not in Linear comments, not in PR descriptions or commit messages, not in external docs — nowhere a non-Replicas surface will render it.
 
-### Always render the workspace link as `[View in Replicas](<url>)`
+### Always render dashboard URLs as `[View in Replicas](<url>)` hyperlinks
 
-Whenever you share the workspace media tab URL — in chat or anywhere else — format it as a markdown hyperlink labeled **View in Replicas**:
+Whenever you share a workspace dashboard URL — in chat or anywhere else — format it as a markdown hyperlink labeled **View in Replicas**:
 
 ```markdown
-[View in Replicas](https://tryreplicas.com/workspaces/<workspace-id>?mode=media)
+[View in Replicas](https://tryreplicas.com/workspaces/<workspace-id>?mode=media&media=<media-id>)
 ```
 
 Never paste the raw URL. Raw URLs look unpolished.
+
+Two flavors of dashboard URL the CLI gives you:
+
+- **Per-file deep link** (default — what `replicas media upload` prints): `...?mode=media&media=<media-id>` opens the dashboard scrolled to that specific file. Use this whenever you're linking to *one* file.
+- **Media tab link** (no `media=` param): `...?mode=media` opens the workspace's media tab listing all files. Use this only when you're pointing at the collection, not a specific file (rare — you almost always have a specific file in mind).
 
 ### In your Replicas chat reply
 
 Include each markdown embed line **verbatim** where you want that file to render inline. The chat substitutes each one with an embedded image, video, or audio player. Multiple embeds can appear in a single reply.
 
-Also tell the user they can find the files in the **media tab** of the workspace, and include a `[View in Replicas](...)` hyperlink (using the URL the CLI printed) so they can open it directly. Do this for every batch of uploads, even when the media is already embedded inline.
+After (or alongside) the embeds, include a `[View in Replicas](<deep-link>)` hyperlink for each file using the per-file URL the CLI printed for that file. This lets the user jump to the specific item in the media tab.
 
 ### On external platforms (Slack, Linear, GitHub, etc.)
 
 Do **both** of these — neither alone is sufficient:
 
 1. Upload the raw bytes via that platform's own upload API (Slack `files.upload`, Linear attachments, Imgur for GitHub PR/issue images, etc.) so the recipient actually sees the media.
-2. Include a `[View in Replicas](https://tryreplicas.com/workspaces/<workspace-id>?mode=media)` hyperlink so they can also find it in Replicas.
+2. Include a `[View in Replicas](<deep-link>)` hyperlink — use the per-file deep link the CLI printed for that file (`...?mode=media&media=<media-id>`), so the recipient lands directly on that specific item.
 
 Do **not** include the `![filename](https://api.tryreplicas.com/...)` markdown embed in external messages. It will render as a broken image / 401 for the recipient.
 
