@@ -153,13 +153,15 @@ If the user wants MCPs configured for them (rare — they'd have to volunteer th
 
 ### Configuration
 
-The configuration tab is where the user tunes an env's settings: system prompt, repo binding, name, description. Most edits are one-off and easier to do with the dashboard form. **Don't try to walk them through editing the system prompt in chat — link them to the tab.**
+The configuration layer is the tunable extras on top of the basics: system prompt, repo binding, name, description.
 
-> An environment's **configuration** is the tunable layer on top of the basics — the system prompt, repo binding, name, description. The dashboard tab has a form for all of it.
+> An environment's **configuration** is the tunable layer on top of the basics — the system prompt, repo binding, name, description.
 
-Point them at `https://tryreplicas.com/dashboard/environment/<env-id>?tab=configuration`.
+**System-prompt edits** → emit `:::edit-configuration` with `environment_id`, `environment_name`, and the current `system_prompt` (read it first via `replicas environment get <env>` if you don't know it). The UI shows a textarea pre-filled with the current prompt and a Save button that PATCHes the env. Synthetic save reply: `Saved configuration for <env>.`. Acknowledge per rule 9 with the configuration tab URL.
 
-If they want a one-shot mutation like "rename the env" or "bind it to a different repo", you can emit `:::confirm-action edit_environment` with the relevant flags. Anything richer (system-prompt iteration, etc.) — just link.
+**One-shot mutations** (rename, change repo binding, etc.) → `:::confirm-action edit_environment` with the relevant flags.
+
+**Broader tuning the form covers better** → link to `https://tryreplicas.com/dashboard/environment/<env-id>?tab=configuration`.
 
 ## Block protocols (env-specific)
 
@@ -203,6 +205,20 @@ script: |
 ```
 
 The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<id>/warm-hooks/save` and sends back the synthetic reply `Saved warm hook for <env-name>.`. On test failure, the UI sends back a `Warm hook test failed (exit N) on <env>.` reply with the sandbox output in a fenced code block — re-emit a new `:::edit-warm-hook` with a fixed script in response.
+
+### `:::edit-configuration`
+
+```
+:::edit-configuration
+environment_id: <env-uuid>
+environment_name: <env-name>
+hint: One short line of context (optional)
+system_prompt: |
+  <current system prompt body — pre-fill from `replicas environment get <env>`>
+:::
+```
+
+The UI shows a textarea pre-filled with `system_prompt` and a Save button. Save PATCHes the env's `system_prompt` field. Synthetic save reply: `Saved configuration for <env>.`. Use this for system-prompt iteration; for other config fields (rename, repo binding) use `:::confirm-action edit_environment` instead.
 
 ## CLI reference
 

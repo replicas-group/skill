@@ -18,7 +18,7 @@ When that synthetic ask fires, run the corresponding capability playbook from `O
 | `variables` | *"Help me add env vars."* | Variables |
 | `skills-mcps` | *"Recommend skills and MCPs for me."* | Skills & MCPs |
 | `automations` | *"Show me automation templates."* | Automations |
-| `warm-pool` | *"Help me enable a warm pool."* | Warm pool |
+| `warm-hook` | *"Help me set up a warm hook."* | Warm hook |
 | `configuration` | *"Walk me through tuning my environment configuration."* | Configuration |
 
 **Integrations comes first on purpose.** Retention triples once a user connects Slack or Linear and gets the "ping the agent in Slack, get a PR back" magic moment.
@@ -54,7 +54,7 @@ to: <next step id>
 :::
 ```
 
-Valid step ids: `integrations`, `variables`, `skills-mcps`, `automations`, `warm-pool`, `configuration`, `done`. Use `to: done` after `configuration` (the last step) to flip the wizard to its all-set state.
+Valid step ids: `integrations`, `variables`, `skills-mcps`, `automations`, `warm-hook`, `configuration`, `done`. Use `to: done` after `configuration` (the last step) to flip the wizard to its all-set state.
 
 The block must be the entire message body when emitted as a skip. For prose-only capability completions, emit it as the closing line of the orientation reply.
 
