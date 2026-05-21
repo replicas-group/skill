@@ -157,7 +157,7 @@ Close with the rule-12 footer.
 
 ## Block protocols (env-specific)
 
-For the cross-cutting blocks (`:::confirm-action`, `:::connect-integration`, `:::automation-templates`, `:::onboarding-advance`), see `ORG-CONFIG.md`.
+For the cross-cutting blocks (`:::confirm-action`, `:::connect-integration`, `:::automation-templates`), see `ORG-CONFIG.md`.
 
 ### `:::secure-input`
 

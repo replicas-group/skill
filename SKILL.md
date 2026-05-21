@@ -119,11 +119,11 @@ Use this when:
 - You need the shared hard rules (no secrets in chat, no clarifying-questions-before-the-block, etc.)
 
 ### Onboarding wizard
-Wizard mechanics for the onboarding workspace: step order, the `Walk me through this step` prompt, the `:::onboarding-advance` escape hatch, pacing. The agent's behavior in onboarding is identical to any other workspace — capability playbooks live in `ENVIRONMENT.md` and `ORG-CONFIG.md`; the wizard is just a stepper on top.
+Wizard mechanics for the onboarding workspace: step order, the `Walk me through this step` prompt, pacing. The agent's behavior in onboarding is identical to any other workspace — capability playbooks live in `ENVIRONMENT.md` and `ORG-CONFIG.md`; the wizard is just a stepper on top.
 
 **Reference:** `references/ONBOARDING.md`
 
 Use this when:
 - The current workspace has `workspace.is_onboarding === true`
 - The user clicks "Walk me through this step" on the wizard accordion
-- You need the onboarding step order or the `:::onboarding-advance` protocol
+- You need the onboarding step order or step ids

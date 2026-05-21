@@ -29,21 +29,6 @@ Environment creation is never a wizard step — the onboarding workspace's env i
 
 3. **Skipping.** The user clicks **Skip** in the accordion (optional steps only). The wizard handles advancement; you don't need to emit anything.
 
-4. **Prose-only fallback** (`:::onboarding-advance`). Reserved for the rare case where a step has no block to resolve. Currently unused — every step has a block. If you ever respond with prose only on a wizard step, close with `:::onboarding-advance` from → to to nudge the wizard.
-
-## `:::onboarding-advance` (escape hatch)
-
-```
-:::onboarding-advance
-from: <current step id>
-to: <next step id>
-:::
-```
-
-Valid step ids: `integrations`, `variables`, `skills-mcps`, `automations`, `warm-hook`, `configuration`, `done`. Use `to: done` after `configuration` to mark the wizard complete.
-
-Silently dropped outside onboarding workspaces — don't emit it elsewhere.
-
 ## Welcome card
 
 The onboarding workspace shows a "Welcome to Replicas onboarding" card in its empty state. The user has seen it before they reach chat — don't restate the framing. Go directly into the first step's playbook when `Walk me through this step` fires on `integrations`.

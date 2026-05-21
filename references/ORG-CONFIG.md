@@ -103,7 +103,7 @@ On save the block records a `replicas-block-outcome` event; the summary lands in
 
 ## Block protocols (cross-cutting)
 
-For env-specific blocks (`:::secure-input`, `:::add-skills-mcps`), see `ENVIRONMENT.md`. For `:::onboarding-advance`, see `ONBOARDING.md`.
+For env-specific blocks (`:::secure-input`, `:::add-skills-mcps`), see `ENVIRONMENT.md`.
 
 Every block is fenced with `:::<name>` and `:::`. Generate fresh ids (`ca_<8-char>`) per block. Prose can appear before/after the block but never inside the fences (only the listed fields).
 
