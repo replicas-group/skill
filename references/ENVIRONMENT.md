@@ -121,10 +121,26 @@ If the user's request is shared infrastructure (deps everyone needs, common cach
 
 Branches:
 
-- **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** enabled only after a passing test. Derive the script body from what the user said in chat (or one of the example uses above); when vague, pick the most likely shape and emit — the user edits in the textarea before testing.
+- **Set up a script** → two-turn flow. Don't emit `:::edit-warm-hook` on the first turn.
+  1. **First turn**: orient with the jot-note framing above, then ask one focused question — what do they want set up (deps install, cache prime, registry login, etc.)? Don't paraphrase the example uses; just ask. No block, no script.
+  2. **Second turn (after the user responds)**: write a tailored script for what they said and emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The script body MUST start with `#!/bin/bash` (the sandbox runs each script as `bash <file>`, but a shebang is required for the file to execute and for `set -e` to apply). After the shebang, include `set -euo pipefail` so a partial failure stops the script. Then the user's commands.
+  3. The UI shows the script editable in a textarea, a **Test** button (sandbox run with streamed stdout/stderr), and a **Save** enabled only after a passing test.
 - **Just browse / iterate manually** → point them at the dashboard tabs. Both URLs:
   - Global: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks`
   - Per-env: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`
+
+**Script shape**. Every `script: |` body you emit MUST:
+- Start with `#!/bin/bash` on line 1.
+- Include `set -euo pipefail` on line 2.
+- Avoid relative paths — the sandbox cwd is not the repo root.
+- Quote variable expansions.
+
+Example minimum:
+```bash
+#!/bin/bash
+set -euo pipefail
+bun install
+```
 
 **When a test fails**, the block renders the sandbox output (exit code + streamed stdout/stderr) and surfaces an **Ask Replicas to fix** button. Clicking it sends you the verdict, output, and current script. Respond by emitting a new `:::edit-warm-hook` with a fixed script — don't write the fix in prose.
 
@@ -169,14 +185,14 @@ suggested_name: "OPENAI_API_KEY"   (optional — only when user named a specific
 :::
 ```
 
-The form has an env dropdown including **+ Create new environment**, so you don't need to create the env first. The agent never sees values. `set-env-file` uses a multi-file picker that auto-fills the path from each filename.
+The block targets the workspace's bound environment (`workspace.environment_id`). The agent does not supply or pick an env. `set-env-file` uses a multi-file picker that auto-fills the path from each filename.
+
+> **All env-scoped blocks are deterministic.** They write to whichever env the workspace is bound to. You never include `environment_id` or `environment_name` in the fence — the UI reads them from workspace context. If the user asks to target a different env, change the workspace's binding (workspace settings), don't emit the block against a different env.
 
 ### `:::add-skills-mcps`
 
 ```
 :::add-skills-mcps
-environment_id: <env-uuid>
-environment_name: <env-name>
 hint: One short line of context (optional)
 :::
 ```
@@ -187,29 +203,25 @@ The UI fetches the recommended skills catalog from the server and renders multi-
 
 ```
 :::edit-warm-hook
-environment_id: <env-uuid>
-environment_name: <env-name>
 hint: One short line of context (optional)
 script: |
   <bash body — derive strictly from chat, no invented defaults>
 :::
 ```
 
-The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<id>/warm-hooks/save` and records a `replicas-block-outcome` event in chat history. You'll see the outcome in your context on the next turn; no chat round-trip is required.
+The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<workspace-env>/warm-hooks/save` and records a `replicas-block-outcome` event in chat history. You'll see the outcome in your context on the next turn; no chat round-trip is required.
 
 ### `:::edit-configuration`
 
 ```
 :::edit-configuration
-environment_id: <env-uuid>
-environment_name: <env-name>
 hint: One short line of context (optional)
 system_prompt: |
   <current system prompt body — pre-fill from `replicas environment get <env>`>
 :::
 ```
 
-The UI also renders inputs for name, description, and a scope picker (Anywhere / Repository / Repo set), pre-filled from the env. Save PATCHes all changed fields and records a `replicas-block-outcome` event.
+The UI also renders inputs for name, description, and a scope picker (Anywhere / Repository / Repo set), pre-filled from the workspace's bound env. Save PATCHes all changed fields and records a `replicas-block-outcome` event.
 
 ## CLI reference
 

@@ -139,13 +139,11 @@ One block per provider. The UI renders the same Connect button as the integratio
 
 ```
 :::automation-templates
-environment_id: <env-uuid>
-environment_name: <env-name>
 hint: One short line of context (optional)
 :::
 ```
 
-The UI shows 4 starter templates (Lint PRs, Sentry triage, Slack @-mention reply, daily smoke). Each has a "Use this" button that creates the automation directly via the API. For custom automations (different trigger, different prompt), use `:::confirm-action create_automation` instead.
+The UI shows 4 starter templates (Lint PRs, Sentry triage, Slack @-mention reply, daily smoke). Each has a "Use this" button that creates the automation against the workspace's bound environment via the API. For custom automations (different trigger, different prompt), use `:::confirm-action create_automation` instead.
 
 ## CLI reference (non-env)
 
