@@ -71,13 +71,7 @@ Three integrations unlock different shapes of automation.
 
 When the user picks one or more, emit `:::connect-integration` with `provider: slack | linear | sentry`. Emit one block per provider if they want multiple.
 
-**After the block(s), close with this exact line** (the connect blocks have no Skip button of their own; this points the user at the wizard's Skip):
-
-```
-(Connect one of the above, or skip this step in the onboarding panel below.)
-```
-
-This is the one allowed exception to rule 9's "no prose after a block" — it's a navigation cue, not a CTA paraphrase.
+**After the block(s)**: in onboarding, use the navigation footer from `ONBOARDING.md` rule 3 (the connect blocks have no Skip button of their own; the wizard's Skip handles that). Outside onboarding, close with the standard rule-12 footer.
 
 **Edge cases**
 - Member, not admin → integrations are admin-only on the credentials side. Members can use already-connected integrations but can't connect new ones. Route them to an admin.

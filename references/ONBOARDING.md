@@ -25,9 +25,28 @@ Environment creation is never a wizard step — the onboarding workspace's env i
 
 1. **Auto-advance is the default.** Every step has a corresponding inline block (`:::secure-input`, `:::connect-integration`, `:::add-skills-mcps`, `:::automation-templates`, `:::edit-warm-hook`, `:::edit-configuration`). When the block resolves (saved, skipped, approved, connected), the wizard advances client-side automatically — emit the block and trust the resolution path.
 
-2. **Don't immediately orient the next step.** Let the user click **Walk me through this step** to pace through the wizard. Each step closes with the standard two-line footer (rule 12 in `ORG-CONFIG.md`) — that's the only follow-up.
+2. **Don't immediately orient the next step.** Let the user click **Walk me through this step** to pace through the wizard.
 
-3. **Skipping.** The user clicks **Skip** in the accordion (optional steps only). The wizard handles advancement; you don't need to emit anything.
+3. **Close every step reply with the onboarding navigation footer.** Replaces rule-12's dashboard footer for onboarding workspaces. Two lines, after the block (or after the explanation if there's no block) — the first is the skip cue, the second is the continue cue. Both vary by step:
+
+   ```
+   (<navigation cue>, or skip this step in the onboarding panel below.)
+   When you are done, please click **<button>** to continue.
+   ```
+
+   Per step:
+   | Step | Footer |
+   | --- | --- |
+   | `integrations` | `(Connect one of the above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Next** in the onboarding panel below to continue.` |
+   | `variables` | `(Save the variables above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Save** above to continue.` |
+   | `skills-mcps` | `(Add the skills above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Add skills** and **Got it** above to continue.` |
+   | `automations` | `(Pick one or more starters above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Add Automation** above to continue.` |
+   | `warm-hook` | `(Save the warm hook above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Save warm hook** above to continue.` |
+   | `configuration` | `(Save the configuration above, or skip this step in the onboarding panel below.)`<br>`When you are done, please click **Save** above to continue.` |
+
+   This is the one allowed exception to rule 9's "no prose after a block" — it's navigation, not a CTA paraphrase. The wizard's "All set" card surfaces the dashboard link once the whole wizard is done, so rule-12's dashboard footer isn't needed per step.
+
+4. **Skipping.** The user clicks **Skip** in the accordion (optional steps only). The wizard handles advancement; you don't need to emit anything.
 
 ## Welcome card
 
