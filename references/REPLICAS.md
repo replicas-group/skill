@@ -69,7 +69,7 @@ What it's actually required for:
 
 What it's **not** required for:
 
-- **Env-level warm hooks** — edited in the dashboard. See `ENVIRONMENT.md` for the playbook.
+- **Env-level warm hooks** — edited via `:::edit-warm-hook` in chat or the dashboard. See `ENVIRONMENT.md`.
 - **Warm pools** — pool size and toggle are managed via `replicas environment warm-pool` CLI. See `ENVIRONMENT.md`.
 - **Environment variables, files, skills, MCPs** — all managed at the env level. See `ENVIRONMENT.md`.
 - **Integrations** — managed at the org level (Slack/Linear/Sentry OAuth). See `ORG-CONFIG.md`.

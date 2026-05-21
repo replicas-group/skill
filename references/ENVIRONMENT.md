@@ -39,7 +39,7 @@ Teams set up **focused envs per task** (`<repo>-debugging`, `<repo>-on-call`, `<
 
 ## Discovering state
 
-Before any capability playbook, run the relevant read-only commands silently so you know what exists:
+Apply `ORG-CONFIG.md`'s **Adapt to state** rule before any capability playbook. The env-specific read-only discovery commands:
 
 ```bash
 replicas environment list                 # all envs in the org
@@ -47,12 +47,6 @@ replicas environment vars list <env>      # variables on one env
 replicas environment files list <env>     # files on one env
 replicas environment warm-pool get <env>  # warm pool status
 ```
-
-Then **adapt to state** (per `ORG-CONFIG.md`'s state-adaptation rule):
-
-- **Nothing set up yet** → orient the user fully with the jot-note framing below. Define the concept, surface the why, then act.
-- **Already set up** → acknowledge what's there in one line, then act on the user's specific ask. Don't re-orient.
-- **Default the env.** If the workspace is bound to an env (`workspace.environment_id`), every action defaults to that env. Don't ask the user to pick or create one unless they raise it.
 
 ## Capability playbooks
 
@@ -64,7 +58,7 @@ Use the orientation block above as the framing. Then branch by what `replicas en
 - **Default env exists for the only repo, user keeps it** → no action needed; acknowledge and close with rule-9 CTA from `ORG-CONFIG.md`.
 - **No env yet, or user wants a new one** → propose `<name>` (auto-derived from repo: `acme/api` → `acme-api`, lowercase, no spaces). Emit `:::confirm-action` with `kind: create_environment`, `summary: Create environment \`<name>\` bound to \`<owner>/<repo>\``, `command: replicas environment create <name> --repository <owner>/<repo>`.
 
-After approval, acknowledge per rule 9 (link to `https://tryreplicas.com/dashboard/environment/<id>?tab=configuration`).
+After approval, close with the rule-12 footer.
 
 **Edge cases**
 - Name collision → suggest a suffix and emit a new confirm-action.
@@ -72,11 +66,11 @@ After approval, acknowledge per rule 9 (link to `https://tryreplicas.com/dashboa
 
 ### Variables
 
-Run `replicas environment vars list <env>` silently. One short line stating what's there (or "nothing yet"), then emit one `:::secure-input` with `action: "set-env-var"` and a `hint` describing the target env. The form has multi-row support; the user adds as many KEY/Value pairs as they want and submits together.
+Emit `:::secure-input` with `action: "set-env-var"` directly. No prose preamble. Don't run `replicas environment vars list` to "check state" — the form shows the env dropdown and the user can see what's there. Don't paraphrase the form's affordances ("supports multi-row", "add KEY/Value pairs") — the block already shows the Add another button and rows.
 
 Do NOT suggest key names. Only the user knows which keys they need. Omit `suggested_name` unless the user named a specific key in chat ("I need CLAUDE_API_KEY and S3_API_KEY"). When they do, emit one block with `suggested_name` for one of the keys.
 
-Synthetic save reply: `Saved <keys> to <env>.` or `Saved N variables (k1, k2, …) to <env>.`. Acknowledge per rule 9, link to `?tab=variables`.
+On save the block records a `replicas-block-outcome` event; you'll see the summary in your context on the next turn. Close with the rule-12 footer.
 
 **Edge cases**
 - User pastes a secret in chat → don't echo it. "Use the form below." Emit a fresh `:::secure-input`.
@@ -86,9 +80,9 @@ Synthetic save reply: `Saved <keys> to <env>.` or `Saved N variables (k1, k2, �
 
 Env files are written into every workspace at a configured path. Use this for config files (`.env.production`), credential JSON, or any content too big for an env var. Encrypted at rest, never in chat.
 
-Run `replicas environment files list <env>` silently. One short line, then emit `:::secure-input` with `action: "set-env-file"` and a `hint`. The form has a file picker that supports multi-upload — the user picks one or more files from disk and the form auto-fills the path from each filename (editable). Submit writes them all.
+Emit `:::secure-input` with `action: "set-env-file"` directly. No prose preamble. Don't list current files first or paraphrase the form's affordances — the block shows the env dropdown, file picker, and path rows.
 
-Synthetic save reply: `Wrote file <path> to <env>.` or `Wrote N files (<paths>) to <env>.`. Acknowledge per rule 9, link to `?tab=files`.
+On save the block records a `replicas-block-outcome` event; you'll see the summary in your context on the next turn. Close with the rule-12 footer.
 
 ### Warm pool
 
@@ -105,7 +99,7 @@ Branches:
 - **Enable / disable / resize** → emit `:::confirm-action` with `kind: toggle_warm_pool`, `command: replicas environment warm-pool enable <env>` (or `disable <env>`, or `set <env> --size <N>` for explicit size).
 - **Pointer-only request** ("just explain it") → orient + link to `?tab=warm-hooks` (the warm-pool config lives on the warm-hooks tab in the dashboard, labeled "Warm Hooks & Pools").
 
-After approval, acknowledge per rule 9 (link to `?tab=warm-hooks`).
+After approval, close with the rule-12 footer.
 
 ### Warm hook
 
@@ -127,14 +121,14 @@ If the user's request is shared infrastructure (deps everyone needs, common cach
 
 Branches:
 
-- **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** that's only enabled after a passing test. The script body must come strictly from what the user said in chat (or one of the example uses above, if they picked one); if they're vague, ask one short clarifier first. Synthetic save reply: `Saved warm hook for <env>.`.
+- **Set up a script** → emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The UI shows an editable textarea, a **Test** button that runs the script in a sandbox, and a **Save** enabled only after a passing test. Derive the script body from what the user said in chat (or one of the example uses above); when vague, pick the most likely shape and emit — the user edits in the textarea before testing.
 - **Just browse / iterate manually** → point them at the dashboard tabs. Both URLs:
   - Global: `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks`
   - Per-env: `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks`
 
-**When a test fails**, you'll get a synthetic chat reply of the form `Warm hook test failed (exit N) on <env>.` (or `timed out`) with a fenced sandbox-output code block and the line `What should I change in the script?`. Read the output, diagnose, and **emit a new `:::edit-warm-hook` block** with a fixed script. Brief one-line lead-in is fine (e.g. *"Looks like there's no `package.json` in the repo — dropping the `bun install` line."*); don't propose changes in prose without re-emitting the block.
+**When a test fails**, the block renders the sandbox output (exit code + streamed stdout/stderr) and surfaces an **Ask Replicas to fix** button. Clicking it sends you the verdict, output, and current script. Respond by emitting a new `:::edit-warm-hook` with a fixed script — don't write the fix in prose.
 
-After save, acknowledge per rule 9 with the warm-hooks tab URL and a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top").
+After save, close with the rule-12 footer plus a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top").
 
 For per-repo warm-hook commands (an extra tier that runs after the env-level hook, in the repo's cwd) see the `replicas.json` section in `REPLICAS.md`.
 
@@ -147,21 +141,19 @@ Both extend what an agent can do, per-environment.
 
 Emit `:::add-skills-mcps` with `environment_id` + `environment_name`. The UI fetches the recommended skills catalog server-side and shows the top picks with checkboxes; MCPs render as cards linking to the dashboard's MCPs tab (since they need secrets). The user picks skills + clicks Add.
 
-Synthetic save reply: `Added skill <name> to <env>.` or `Added N skills (<names>) to <env>.`. Acknowledge per rule 9 (link to `?tab=skills`).
+On save the block records a `replicas-block-outcome` event; the summary lands in your context on the next turn. Close with the rule-12 footer.
 
 If the user wants MCPs configured for them (rare — they'd have to volunteer the secrets), guide them to the dashboard tab. Do not collect MCP secrets via secure-input — that flow only saves to env vars, not MCP config.
 
 ### Configuration
 
-The configuration layer is the tunable extras on top of the basics: system prompt, repo binding, name, description.
+> An environment's **configuration** is the tunable layer on top of the basics: name, description, repo binding (scope), and system prompt.
 
-> An environment's **configuration** is the tunable layer on top of the basics — the system prompt, repo binding, name, description.
+Emit `:::edit-configuration` for every "tune configuration" ask, including the wizard's prompt. The UI shows all four fields editable inline: a name input, description input, scope picker (Anywhere / Repository / Repo set), and a system-prompt textarea pre-filled with the current value. Save PATCHes the env.
 
-**System-prompt edits** → emit `:::edit-configuration` with `environment_id`, `environment_name`, and the current `system_prompt` (read it first via `replicas environment get <env>` if you don't know it). The UI shows a textarea pre-filled with the current prompt and a Save button that PATCHes the env. Synthetic save reply: `Saved configuration for <env>.`. Acknowledge per rule 9 with the configuration tab URL.
+When emitting, pass `environment_id`, `environment_name`, and `system_prompt` (read it first via `replicas environment get <env>` if unknown; pass empty string if unset). The other fields are hydrated from the env on render.
 
-**One-shot mutations** (rename, change repo binding, etc.) → `:::confirm-action edit_environment` with the relevant flags.
-
-**Broader tuning the form covers better** → link to `https://tryreplicas.com/dashboard/environment/<env-id>?tab=configuration`.
+Close with the rule-12 footer.
 
 ## Block protocols (env-specific)
 
@@ -195,7 +187,6 @@ The UI fetches the recommended skills catalog from the server and renders multi-
 
 ```
 :::edit-warm-hook
-id: wh_<8-char-random>
 environment_id: <env-uuid>
 environment_name: <env-name>
 hint: One short line of context (optional)
@@ -204,7 +195,7 @@ script: |
 :::
 ```
 
-The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<id>/warm-hooks/save` and sends back the synthetic reply `Saved warm hook for <env-name>.`. On test failure, the UI sends back a `Warm hook test failed (exit N) on <env>.` reply with the sandbox output in a fenced code block — re-emit a new `:::edit-warm-hook` with a fixed script in response.
+The UI shows an editable textarea pre-filled with `script`, a **Test** button that runs the script in an isolated sandbox and streams the output, and a **Save** that's only enabled after a passing test. On save the UI POSTs to `/v1/environments/<id>/warm-hooks/save` and records a `replicas-block-outcome` event in chat history. You'll see the outcome in your context on the next turn; no chat round-trip is required.
 
 ### `:::edit-configuration`
 
@@ -218,7 +209,7 @@ system_prompt: |
 :::
 ```
 
-The UI shows a textarea pre-filled with `system_prompt` and a Save button. Save PATCHes the env's `system_prompt` field. Synthetic save reply: `Saved configuration for <env>.`. Use this for system-prompt iteration; for other config fields (rename, repo binding) use `:::confirm-action edit_environment` instead.
+The UI also renders inputs for name, description, and a scope picker (Anywhere / Repository / Repo set), pre-filled from the env. Save PATCHes all changed fields and records a `replicas-block-outcome` event.
 
 ## CLI reference
 
@@ -226,10 +217,10 @@ The UI shows a textarea pre-filled with `system_prompt` and a Save button. Save 
 
 ```bash
 replicas environment list
-replicas environment get <id-or-name>          # use "global" for the Global env
+replicas environment get <env>          # use "global" for the Global env
 replicas environment create <name> --repository <repo>
-replicas environment edit <id-or-name> [--name "..."] [--repository <repo>]
-replicas environment delete <id-or-name> [--force]
+replicas environment edit <env> [--name "..."] [--repository <repo>]
+replicas environment delete <env> [--force]
 ```
 
 Notes:
@@ -283,11 +274,11 @@ replicas environment warm-pool set <env> --size <N>     # 0 disables, 1-20 enabl
 
 | Change | URL |
 | --- | --- |
-| Env created or edited | `https://tryreplicas.com/dashboard/environment/<id>?tab=configuration` |
-| Variable created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<id>?tab=variables` |
-| Env file created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<id>?tab=files` |
-| Skill added | `https://tryreplicas.com/dashboard/environment/<id>?tab=skills` |
-| MCP added | `https://tryreplicas.com/dashboard/environment/<id>?tab=mcps` |
+| Env created or edited | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=configuration` |
+| Variable created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=variables` |
+| Env file created/edited/deleted | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=files` |
+| Skill added | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=skills` |
+| MCP added | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=mcps` |
 | Warm hook (per-env) | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` |
 | Warm hook (global) | `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` |
 | Warm pool toggled | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` (same tab — labeled "Warm Hooks & Pools") |
