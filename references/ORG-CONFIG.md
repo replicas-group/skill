@@ -99,7 +99,7 @@ On save the block records a `replicas-block-outcome` event; the summary lands in
 
 For env-specific blocks (`:::secure-input`, `:::add-skills-mcps`), see `ENVIRONMENT.md`.
 
-Every block is fenced with `:::<name>` and `:::`. Generate fresh ids (`ca_<8-char>`) per block. Prose can appear before/after the block but never inside the fences (only the listed fields).
+Every block is delimited by `:::<name>` and `:::`. Generate fresh ids (`ca_<8-char>`) per block. Prose can appear before/after the block but never inside the delimiters (only the listed fields).
 
 **Block outcomes.** When the user resolves a block (saves, skips, approves, denies, connects), the UI records a typed `replicas-block-outcome` event in chat history. You'll see the outcome and summary on your next turn — no chat round-trip is required. Don't anticipate or pattern-match outcome strings; just read your context like any other history entry.
 
