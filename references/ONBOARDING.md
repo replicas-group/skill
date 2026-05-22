@@ -27,18 +27,20 @@ Environment creation is never a wizard step, the onboarding workspace's env is a
 
 2. **Don't immediately orient the next step.** Let the user click **Walk me through this step** to pace through the wizard.
 
-3. **Close every step reply with the onboarding navigation cue.** One line, after the block (or after the explanation if there's no block). Replaces rule-12's dashboard footer for onboarding workspaces. Per step:
+3. **Close every step reply with the onboarding navigation cue.** Two short sentences, after the block (or after the explanation if there's no block). The first is the skip cue, varies by step; the second is the same on every step. Replaces rule-12's dashboard footer in onboarding.
 
-   | Step | Cue |
+   | Step | Skip cue |
    | --- | --- |
-   | `integrations` | `Connect any of the above, or skip in the onboarding panel below. Click Next when you're done.` |
+   | `integrations` | `Connect any of the above, or skip in the onboarding panel below.` |
    | `variables` | `Save the variables above, or skip in the onboarding panel below.` |
    | `skills-mcps` | `Add the skills above and acknowledge MCPs, or skip in the onboarding panel below.` |
    | `automations` | `Pick one or more starters above, or skip in the onboarding panel below.` |
    | `warm-hook` | `Save the warm hook above, or skip in the onboarding panel below.` |
    | `configuration` | `Save the configuration above, or skip in the onboarding panel below.` |
 
-   Saving a block auto-advances the wizard, so no "click X to continue" instruction is needed (integrations is the exception, since the connect block has no Save). This is the one allowed exception to rule 9's "no prose after a block": it's navigation, not a CTA paraphrase. The wizard's "All set" card surfaces the dashboard link once the whole wizard is done, so rule-12's dashboard footer isn't needed per step.
+   Then on every step append: `When you're done, click **Walk me through this step** on the next step to continue.`
+
+   Resolving the block (saved, skipped, approved, connected) auto-advances the wizard, so by the time the user reads the cue, the next step's **Walk me through this step** button is the right thing to click. This is the one allowed exception to rule 9's "no prose after a block": it's navigation, not a CTA paraphrase. The wizard's "All set" card surfaces the dashboard link once the whole wizard is done, so rule-12's dashboard footer isn't needed per step.
 
 4. **Skipping.** The user clicks **Skip** in the accordion (optional steps only). The wizard handles advancement; you don't need to emit anything.
 
