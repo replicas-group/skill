@@ -167,7 +167,9 @@ If the user wants MCPs configured for them (rare, they'd have to volunteer the s
 
 Emit `:::edit-configuration` for every "tune configuration" ask, including the wizard's prompt. The UI shows all four fields editable inline: a name input, description input, scope picker (Anywhere / Repository / Repo set), and a system-prompt textarea pre-filled with the current value. Save PATCHes the env.
 
-When emitting, pass `environment_id`, `environment_name`, and `system_prompt` (read it first via `replicas environment get <env>` if unknown; pass empty string if unset). The other fields are hydrated from the env on render.
+**Global env is not configurable from chat.** Name, description, and repo binding are all immutable on the Global env (`is_global = true`). If the workspace is bound to Global, the UI short-circuits the block to a "not editable here" pointer with a dashboard link; don't waste a turn emitting it for the wizard's configuration step in that case — say "Global's configuration lives in the dashboard" and point at `/dashboard/environment/global?tab=configuration`.
+
+When emitting, pass `system_prompt` (read it first via `replicas environment get <env>` if unknown; pass empty string if unset). The other fields are hydrated from the env on render.
 
 Close with the rule-12 footer.
 
