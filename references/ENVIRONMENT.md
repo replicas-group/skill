@@ -1,6 +1,6 @@
 # Environments
 
-This guide covers everything about Replicas **environments** — the org-scoped blueprints that workspaces are built from. Includes concepts, CLI commands, agent-behavior playbooks, block protocols for env actions, dashboard URLs, and edge cases.
+This guide covers everything about Replicas **environments**: the org-scoped blueprints that workspaces are built from. Includes concepts, CLI commands, agent-behavior playbooks, block protocols for env actions, dashboard URLs, and edge cases.
 
 For shared agent rules (hard rules about block emission, tone, state-adaptation, permissions), see `ORG-CONFIG.md`. For the CLI primer and non-env commands, see `REPLICAS.md`.
 
@@ -26,12 +26,12 @@ Anything that's scoped to a single environment lives here. Cross-cutting actions
 
 An environment is the blueprint workspaces boot from. It bundles everything an agent needs to do a specific kind of work:
 
-- **Repo** — codebase the workspace clones
-- **Agent** — Claude, Codex, or Bedrock
-- **System prompt** — instructions tuned for this env's job
-- **Env vars / files** — secrets and config
-- **Skills & MCPs** — extra capabilities you give the agent
-- **Warm hook & pool** — setup script + hot-workspace queue for fast starts
+- **Repo**: codebase the workspace clones
+- **Agent**: Claude, Codex, or Bedrock
+- **System prompt**: instructions tuned for this env's job
+- **Env vars / files**: secrets and config
+- **Skills & MCPs**: extra capabilities you give the agent
+- **Warm hook & pool**: setup script + hot-workspace queue for fast starts
 
 Teams set up **focused envs per task** (`<repo>-debugging`, `<repo>-on-call`, `<repo>-content`) so each agent has tight context. Common config lives in the **Global** env and inherits everywhere.
 
@@ -66,7 +66,7 @@ After approval, close with the rule-12 footer.
 
 ### Variables
 
-Emit `:::secure-input` with `action: "set-env-var"` directly. No prose preamble. Don't run `replicas environment vars list` to "check state" — the form shows the env dropdown and the user can see what's there. Don't paraphrase the form's affordances ("supports multi-row", "add KEY/Value pairs") — the block already shows the Add another button and rows.
+Emit `:::secure-input` with `action: "set-env-var"` directly. No prose preamble. Don't run `replicas environment vars list` to "check state", the form shows the env dropdown and the user can see what's there. Don't paraphrase the form's affordances ("supports multi-row", "add KEY/Value pairs"), the block already shows the Add another button and rows.
 
 Do NOT suggest key names. Only the user knows which keys they need. Omit `suggested_name` unless the user named a specific key in chat ("I need CLAUDE_API_KEY and S3_API_KEY"). When they do, emit one block with `suggested_name` for one of the keys.
 
@@ -80,7 +80,7 @@ On save the block records a `replicas-block-outcome` event; you'll see the summa
 
 Env files are written into every workspace at a configured path. Use this for config files (`.env.production`), credential JSON, or any content too big for an env var. Encrypted at rest, never in chat.
 
-Emit `:::secure-input` with `action: "set-env-file"` directly. No prose preamble. Don't list current files first or paraphrase the form's affordances — the block shows the env dropdown, file picker, and path rows.
+Emit `:::secure-input` with `action: "set-env-file"` directly. No prose preamble. Don't list current files first or paraphrase the form's affordances, the block shows the env dropdown, file picker, and path rows.
 
 On save the block records a `replicas-block-outcome` event; you'll see the summary in your context on the next turn. Close with the rule-12 footer.
 
@@ -90,9 +90,9 @@ A warm pool keeps a handful of pre-provisioned workspaces hot in the background 
 
 > A **warm pool** keeps a few fully-provisioned workspaces hot. The next workspace your agent boots starts in seconds.
 >
-> - **Pool size** — user-settable, 0 to 20 workspaces. 0 disables the pool.
-> - **Most useful when** — automations fire often (PR triggers, on-call debugging, daily crons)
-> - **Cost** — workspaces in the pool count against your usage even when idle
+> - **Pool size**: user-settable, 0 to 20 workspaces. 0 disables the pool.
+> - **Most useful when**: automations fire often (PR triggers, on-call debugging, daily crons)
+> - **Cost**: workspaces in the pool count against your usage even when idle
 
 Branches:
 
@@ -107,22 +107,22 @@ Two-tier hierarchy:
 
 > A **warm hook** is a bash script that runs once when a workspace provisions. Two tiers:
 >
-> - **Global warm hook** — runs in every workspace across every environment. Good for shared setup that applies everywhere.
-> - **Per-environment warm hook** — runs *after* the global one, in workspaces bound to a specific environment. Good for more specialized setup (a build cache for one repo, a specific registry login, etc.).
+> - **Global warm hook**: runs in every workspace across every environment. Good for shared setup that applies everywhere.
+> - **Per-environment warm hook**: runs *after* the global one, in workspaces bound to a specific environment. Good for more specialized setup (a build cache for one repo, a specific registry login, etc.).
 >
 > Common uses:
 >
-> - **Installing deps** — `bun install`, `pnpm install`, `pip install -r requirements.txt`
-> - **Priming caches** — warm a build cache or download model weights
-> - **Private-registry login** — `gh auth login --with-token < ~/.token`
-> - **Pre-pulling images** — `docker pull <internal-image>`
+> - **Installing deps**: `bun install`, `pnpm install`, `pip install -r requirements.txt`
+> - **Priming caches**: warm a build cache or download model weights
+> - **Private-registry login**: `gh auth login --with-token < ~/.token`
+> - **Pre-pulling images**: `docker pull <internal-image>`
 
 If the user's request is shared infrastructure (deps everyone needs, common cache), default to the **global** warm hook so it applies everywhere; if it's specific to one repo or workflow, default to the **per-environment** warm hook.
 
 Branches:
 
 - **Set up a script** → two-turn flow. Don't emit `:::edit-warm-hook` on the first turn.
-  1. **First turn**: orient with the jot-note framing above, then ask one focused question — what do they want set up (deps install, cache prime, registry login, etc.)? Don't paraphrase the example uses; just ask. No block, no script.
+  1. **First turn**: orient with the jot-note framing above, then ask one focused question, what do they want set up (deps install, cache prime, registry login, etc.)? Don't paraphrase the example uses; just ask. No block, no script.
   2. **Second turn (after the user responds)**: write a tailored script for what they said and emit `:::edit-warm-hook` with `environment_id`, `environment_name`, and a `script: |` body. The script body MUST start with `#!/bin/bash` (the sandbox runs each script as `bash <file>`, but a shebang is required for the file to execute and for `set -e` to apply). After the shebang, include `set -euo pipefail` so a partial failure stops the script. Then the user's commands.
   3. The UI shows the script editable in a textarea, a **Test** button (sandbox run with streamed stdout/stderr), and a **Save** enabled only after a passing test.
 - **Just browse / iterate manually** → point them at the dashboard tabs. Both URLs:
@@ -132,7 +132,7 @@ Branches:
 **Script shape**. Every `script: |` body you emit MUST:
 - Start with `#!/bin/bash` on line 1.
 - Include `set -euo pipefail` on line 2.
-- Avoid relative paths — the sandbox cwd is not the repo root.
+- Avoid relative paths, the sandbox cwd is not the repo root.
 - Quote variable expansions.
 
 Example minimum:
@@ -142,7 +142,7 @@ set -euo pipefail
 bun install
 ```
 
-**When a test fails**, the block renders the sandbox output (exit code + streamed stdout/stderr) and surfaces an **Ask Replicas to fix** button. Clicking it sends you the verdict, output, and current script. Respond by emitting a new `:::edit-warm-hook` with a fixed script — don't write the fix in prose.
+**When a test fails**, the block renders the sandbox output (exit code + streamed stdout/stderr) and surfaces an **Ask Replicas to fix** button. Clicking it sends you the verdict, output, and current script. Respond by emitting a new `:::edit-warm-hook` with a fixed script, don't write the fix in prose.
 
 After save, close with the rule-12 footer plus a one-line hierarchy reminder ("Global runs first, then this env's hook layers on top").
 
@@ -152,14 +152,14 @@ For per-repo warm-hook commands (an extra tier that runs after the env-level hoo
 
 Both extend what an agent can do, per-environment.
 
-> - **Skills** — pre-packaged playbooks the agent can load on demand (a "PR review skill", a "Linear triage skill"). One-click add from the recommended catalog.
-> - **MCPs** — external tools the agent can call (Postgres, Notion, Atlassian). Need provider secrets, so configured in the dashboard.
+> - **Skills**: pre-packaged playbooks the agent can load on demand (a "PR review skill", a "Linear triage skill"). One-click add from the recommended catalog.
+> - **MCPs**: external tools the agent can call (Postgres, Notion, Atlassian). Need provider secrets, so configured in the dashboard.
 
 Emit `:::add-skills-mcps` with `environment_id` + `environment_name`. The UI fetches the recommended skills catalog server-side and shows the top picks with checkboxes; MCPs render as cards linking to the dashboard's MCPs tab (since they need secrets). The user picks skills + clicks Add.
 
 On save the block records a `replicas-block-outcome` event; the summary lands in your context on the next turn. Close with the rule-12 footer.
 
-If the user wants MCPs configured for them (rare — they'd have to volunteer the secrets), guide them to the dashboard tab. Do not collect MCP secrets via secure-input — that flow only saves to env vars, not MCP config.
+If the user wants MCPs configured for them (rare, they'd have to volunteer the secrets), guide them to the dashboard tab. Do not collect MCP secrets via secure-input, that flow only saves to env vars, not MCP config.
 
 ### Configuration
 
@@ -181,13 +181,13 @@ For the cross-cutting blocks (`:::confirm-action`, `:::connect-integration`, `::
 :::secure-input
 action: set-env-var | upload-file-to-var | set-env-file
 hint: "What this is for, e.g. 'Environment variables for replicas-dev'"
-suggested_name: "OPENAI_API_KEY"   (optional — only when user named a specific key)
+suggested_name: "OPENAI_API_KEY"   (optional, only when user named a specific key)
 :::
 ```
 
 The block targets the workspace's bound environment (`workspace.environment_id`). The agent does not supply or pick an env. `set-env-file` uses a multi-file picker that auto-fills the path from each filename.
 
-> **All env-scoped blocks are deterministic.** They write to whichever env the workspace is bound to. You never include `environment_id` or `environment_name` in the fence — the UI reads them from workspace context. If the user asks to target a different env, change the workspace's binding (workspace settings), don't emit the block against a different env.
+> **All env-scoped blocks are deterministic.** They write to whichever env the workspace is bound to. You never include `environment_id` or `environment_name` in the fence, the UI reads them from workspace context. If the user asks to target a different env, change the workspace's binding (workspace settings), don't emit the block against a different env.
 
 ### `:::add-skills-mcps`
 
@@ -205,7 +205,7 @@ The UI fetches the recommended skills catalog from the server and renders multi-
 :::edit-warm-hook
 hint: One short line of context (optional)
 script: |
-  <bash body — derive strictly from chat, no invented defaults>
+  <bash body, derive strictly from chat, no invented defaults>
 :::
 ```
 
@@ -217,7 +217,7 @@ The UI shows an editable textarea pre-filled with `script`, a **Test** button th
 :::edit-configuration
 hint: One short line of context (optional)
 system_prompt: |
-  <current system prompt body — pre-fill from `replicas environment get <env>`>
+  <current system prompt body, pre-fill from `replicas environment get <env>`>
 :::
 ```
 
@@ -238,17 +238,17 @@ replicas environment delete <env> [--force]
 Notes:
 - Environments resolve by name or UUID. `global` is an alias for the org's Global env.
 - Non-global envs need a repo (or repo set) to back a workspace.
-- `edit` on the Global env is rejected — manage its contents (vars/files) instead.
+- `edit` on the Global env is rejected, manage its contents (vars/files) instead.
 
 ### Env vars
 
 ```bash
 replicas environment vars list <env>
-replicas environment vars set <env> <KEY> <VALUE>          # forbidden in chat — use :::secure-input
+replicas environment vars set <env> <KEY> <VALUE>          # forbidden in chat, use :::secure-input
 replicas environment vars delete <env> <KEY|ID> [--force]
 ```
 
-`vars set` is upsert. Secrets must not pass through chat or confirm-action — always use `:::secure-input`.
+`vars set` is upsert. Secrets must not pass through chat or confirm-action, always use `:::secure-input`.
 
 ### Env files
 
@@ -282,7 +282,7 @@ replicas environment warm-pool set <env> --size <N>     # 0 disables, 1-20 enabl
 
 ## Dashboard URLs
 
-**Acknowledgment links must be tab-precise** — land the user on the exact tab that shows the change they just made.
+**Acknowledgment links must be tab-precise**: land the user on the exact tab that shows the change they just made.
 
 | Change | URL |
 | --- | --- |
@@ -293,7 +293,7 @@ replicas environment warm-pool set <env> --size <N>     # 0 disables, 1-20 enabl
 | MCP added | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=mcps` |
 | Warm hook (per-env) | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` |
 | Warm hook (global) | `https://tryreplicas.com/dashboard/environment/global?tab=warm-hooks` |
-| Warm pool toggled | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` (same tab — labeled "Warm Hooks & Pools") |
+| Warm pool toggled | `https://tryreplicas.com/dashboard/environment/<env-id>?tab=warm-hooks` (same tab, labeled "Warm Hooks & Pools") |
 
 Other env-related pages:
 

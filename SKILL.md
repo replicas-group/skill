@@ -54,7 +54,7 @@ Use this when:
 - You need to include images in PR descriptions
 
 ### Google Workspace (Docs, Sheets, Forms, Drive)
-Create and edit Google Docs, Sheets, and Forms via the Replicas gateway. Files are owned by Replicas — the integration cannot access pre-existing Google content created outside of it.
+Create and edit Google Docs, Sheets, and Forms via the Replicas gateway. Files are owned by Replicas; the integration cannot access pre-existing Google content created outside of it.
 
 **Reference:** `references/GOOGLE.md`
 
@@ -80,7 +80,7 @@ Share screenshots, screen recordings, generated diagrams, and audio clips inline
 
 Use this when:
 - You produce a screenshot, recording, generated image, or audio clip the user should see
-- You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
+- You record video output (browser automation, screen capture), including the recommended aspect ratio and FPS
 - You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
 
 ### Replicas CLI (overview)
@@ -93,7 +93,7 @@ Use this when:
 - The user asks to scaffold a `replicas.json` / `replicas.yaml` in a repo
 - You want to know which topical reference covers a given action
 
-For *general questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first. For taking action, use the `replicas` CLI and the topical refs — never WebFetch in place of running a CLI command.
+For *general questions about how Replicas works* (concepts, pricing, what a feature does), check https://docs.tryreplicas.com first. For taking action, use the `replicas` CLI and the topical refs; never WebFetch in place of running a CLI command.
 
 ### Environments
 Self-contained guide to environments: env vars, env files, warm pool, warm hook, skills, MCPs, configuration. Concepts + CLI + agent-behavior playbooks + env-specific block protocols (`:::secure-input`, `:::add-skills-mcps`) + dashboard URLs + edge cases.
@@ -119,7 +119,7 @@ Use this when:
 - You need the shared hard rules (no secrets in chat, no clarifying-questions-before-the-block, etc.)
 
 ### Onboarding wizard
-Wizard mechanics for the onboarding workspace: step order, the `Walk me through this step` prompt, pacing. The agent's behavior in onboarding is identical to any other workspace — capability playbooks live in `ENVIRONMENT.md` and `ORG-CONFIG.md`; the wizard is just a stepper on top.
+Wizard mechanics for the onboarding workspace: step order, the `Walk me through this step` prompt, pacing. The agent's behavior in onboarding is identical to any other workspace; capability playbooks live in `ENVIRONMENT.md` and `ORG-CONFIG.md`, the wizard is just a stepper on top.
 
 **Reference:** `references/ONBOARDING.md`
 

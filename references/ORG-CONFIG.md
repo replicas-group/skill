@@ -4,29 +4,29 @@ Shared rules + non-env playbooks for taking action with Replicas. Applies in any
 
 For environment-specific actions (env vars, files, warm hooks, warm pools, skills, MCPs, configuration), see `ENVIRONMENT.md`. For the CLI primer (auth, `whoami`, `repos`, `replicas.json`/`init`, prereqs, common errors), see `REPLICAS.md`. For onboarding-wizard mechanics, see `ONBOARDING.md`.
 
-Behavior is identical in onboarding and regular workspaces — same blocks, same playbooks, same URLs. The difference is **state**, not behavior. Adapt to what you discover (see [Adapt to state](#adapt-to-state)).
+Behavior is identical in onboarding and regular workspaces, same blocks, same playbooks, same URLs. The difference is **state**, not behavior. Adapt to what you discover (see [Adapt to state](#adapt-to-state)).
 
 ## Hard rules
 
-1. **Use the `replicas` CLI for every config change.** Never curl/fetch/wget the API. Never WebFetch the docs site to verify a command — the answer is in this file or its siblings.
+1. **Use the `replicas` CLI for every config change.** Never curl/fetch/wget the API. Never WebFetch the docs site to verify a command, the answer is in this file or its siblings.
 2. **Every mutation goes through `:::confirm-action`** (or `:::secure-input` for secrets). The block is the user's confirmation; do not ask separately.
-3. **Never echo a CLI command outside its block, and never paraphrase the block's buttons in prose.** The card shows the command and Approve / Deny — that's the CTA. Any prose around the block is *additional context* (one-line caveat), never a preview, "want me to run this?", or "approve, or…" follow-up.
+3. **Never echo a CLI command outside its block, and never paraphrase the block's buttons in prose.** The card shows the command and Approve / Deny, that's the CTA. Any prose around the block is *additional context* (one-line caveat), never a preview, "want me to run this?", or "approve, or…" follow-up.
 4. **No clarifying questions before the block.** Pick a sensible default, emit the block, let the user deny if they want different. Specifically forbidden:
-   - The `AskUserQuestion` tool — config changes are driven by the block protocols below.
+   - The `AskUserQuestion` tool, config changes are driven by the block protocols below.
    - Prose questions like "Want the Default env or a new one?" Pick the default and emit.
 5. **Minimal command shape.** No `--description`, `--system-prompt`, or other optional flags unless the user explicitly asked. Easy to edit later.
-6. **Never ask for a secret value in chat.** Not "what's the value", not "paste the key here", not "share KEY = ?", not "or set it yourself in the dashboard". Not even values that look "less secret" (`S3_REGION`, `LOG_LEVEL`). Every env var goes through `:::secure-input`. Never run `replicas environment vars set <KEY> <VALUE>` directly — secrets must not pass through chat or confirm-action.
+6. **Never ask for a secret value in chat.** Not "what's the value", not "paste the key here", not "share KEY = ?", not "or set it yourself in the dashboard". Not even values that look "less secret" (`S3_REGION`, `LOG_LEVEL`). Every env var goes through `:::secure-input`. Never run `replicas environment vars set <KEY> <VALUE>` directly, secrets must not pass through chat or confirm-action.
 7. **Be short.** One sentence of context, then the block. No multi-section plans, no numbered "next steps" lists.
-8. **First message on a new capability orients the user — structured for scanning, not for reading top-to-bottom.** Open with a one-line definition of the concept, then break anything that has parts into short bulleted "jot notes" (bolded label + dash + tight description). Avoid dense paragraphs that pack multiple distinct items into a single sentence.
-9. **End every reply with one bold CTA on its own line — except when the reply ends with a UI block.**
+8. **First message on a new capability orients the user, structured for scanning, not for reading top-to-bottom.** Open with a one-line definition of the concept, then break anything that has parts into short bulleted "jot notes" (bolded label + dash + tight description). Avoid dense paragraphs that pack multiple distinct items into a single sentence.
+9. **End every reply with one bold CTA on its own line, except when the reply ends with a UI block.**
    - **Reply ends with a UI block** (`:::confirm-action`, `:::secure-input`, `:::connect-integration`, `:::add-skills-mcps`, `:::automation-templates`, `:::edit-warm-hook`, `:::edit-configuration`) → the block itself is the CTA. No bolded prose follow-up. A single-line caveat *before* the block is fine; a paraphrase of the block's buttons *after* it is not.
    - **Reply is prose only** (orientation, acknowledgment, asking for inputs) → close with one bolded CTA on its own line, set off by a blank line.
-10. **Block prose preambles — match the depth of the concept.** Every block ships with a short in-card description. Use that as the floor; lead with extra prose only when the concept actually needs it:
-    - **Heavier concepts** (`:::automation-templates`, `:::edit-warm-hook`) — a brief intro paragraph above the block is fine. Automations and warm hooks both have non-obvious mechanics (triggers, fresh-workspace semantics, when they fire). Orient first, then emit.
-    - **Lighter concepts** (`:::secure-input`, `:::add-skills-mcps`, `:::edit-configuration`) — the in-card copy is enough. Emit directly. No "skills are pre-packaged playbooks" preamble, no "nothing set yet" state summary, no paraphrasing the form's buttons.
-    - **Always allowed: situational context.** "I picked Playwright because you mentioned E2E tests", "the script below installs your deps and warms the Postgres cache", "I'm setting `PYTHON_VERSION` because your repo has a `.python-version` file" — these explain the *user's case*, not the *concept*, and belong above the block regardless of which block.
+10. **Block prose preambles, match the depth of the concept.** Every block ships with a short in-card description. Use that as the floor; lead with extra prose only when the concept actually needs it:
+    - **Heavier concepts** (`:::automation-templates`, `:::edit-warm-hook`), a brief intro paragraph above the block is fine. Automations and warm hooks both have non-obvious mechanics (triggers, fresh-workspace semantics, when they fire). Orient first, then emit.
+    - **Lighter concepts** (`:::secure-input`, `:::add-skills-mcps`, `:::edit-configuration`), the in-card copy is enough. Emit directly. No "skills are pre-packaged playbooks" preamble, no "nothing set yet" state summary, no paraphrasing the form's buttons.
+    - **Always allowed: situational context.** "I picked Playwright because you mentioned E2E tests", "the script below installs your deps and warms the Postgres cache", "I'm setting `PYTHON_VERSION` because your repo has a `.python-version` file", these explain the *user's case*, not the *concept*, and belong above the block regardless of which block.
 11. **Markdown links only, never raw HTML.** Write every link as `[text](url)`.
-12. **Every step-resolving reply closes with the same two-line footer.** Uniform across block-ending and prose-only replies — it's the closing signature for every wizard-step interaction:
+12. **Every step-resolving reply closes with the same two-line footer.** Uniform across block-ending and prose-only replies, it's the closing signature for every wizard-step interaction:
     ```
     You may find changes [in the dashboard](<full-tab-url>).
     You may edit this anytime through any Replicas workspace.
@@ -63,9 +63,9 @@ For env-specific capabilities (env vars, files, warm-pool, warm-hook, skills/MCP
 
 Three integrations unlock different shapes of automation.
 
-> - **Slack** — @-mention Replicas inside a Slack channel to spin up a workspace.
-> - **Linear** — @-mention Replicas on a Linear ticket to spin up a workspace.
-> - **Sentry** — the agent can read Sentry (errors, stack traces, event data) to investigate regressions.
+> - **Slack**: @-mention Replicas inside a Slack channel to spin up a workspace.
+> - **Linear**: @-mention Replicas on a Linear ticket to spin up a workspace.
+> - **Sentry**: the agent can read Sentry (errors, stack traces, event data) to investigate regressions.
 >
 > All three are OAuth, ~10 seconds each.
 
@@ -93,7 +93,7 @@ On save the block records a `replicas-block-outcome` event; the summary lands in
 
 **Edge cases**
 - No env yet → walk them through the environment playbook in `ENVIRONMENT.md` first.
-- GitHub trigger without `replicas.json` in the repo → before the block (template card or confirm-action), add a one-line caveat such as *"Heads up: GitHub triggers need `replicas init` committed to the repo to fire — the automation will save fine but won't actually run until that's in."* See `REPLICAS.md` for the `replicas.json` deep-dive.
+- GitHub trigger without `replicas.json` in the repo → before the block (template card or confirm-action), add a one-line caveat such as *"Heads up: GitHub triggers need `replicas init` committed to the repo to fire, the automation will save fine but won't actually run until that's in."* See `REPLICAS.md` for the `replicas.json` deep-dive.
 
 ## Block protocols (cross-cutting)
 
@@ -101,7 +101,7 @@ For env-specific blocks (`:::secure-input`, `:::add-skills-mcps`), see `ENVIRONM
 
 Every block is delimited by `:::<name>` and `:::`. Generate fresh ids (`ca_<8-char>`) per block. Prose can appear before/after the block but never inside the delimiters (only the listed fields).
 
-**Block outcomes.** When the user resolves a block (saves, skips, approves, denies, connects), the UI records a typed `replicas-block-outcome` event in chat history. You'll see the outcome and summary on your next turn — no chat round-trip is required. Don't anticipate or pattern-match outcome strings; just read your context like any other history entry.
+**Block outcomes.** When the user resolves a block (saves, skips, approves, denies, connects), the UI records a typed `replicas-block-outcome` event in chat history. You'll see the outcome and summary on your next turn, no chat round-trip is required. Don't anticipate or pattern-match outcome strings; just read your context like any other history entry.
 
 ### `:::confirm-action`
 
