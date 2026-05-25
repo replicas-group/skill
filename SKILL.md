@@ -78,10 +78,12 @@ Share screenshots, screen recordings, generated diagrams, and audio clips inline
 
 **Reference:** `references/MEDIA.md`
 
+Read MEDIA.md **before** sending any message that includes media — to Replicas chat or to any external integration (Slack, Linear, GitHub, etc.). The rules for sharing media externally live entirely in MEDIA.md; the per-integration files only point back to it.
+
 Use this when:
 - You produce a screenshot, recording, generated image, or audio clip the user should see
 - You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
-- You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
+- You are about to post a message to Slack/Linear/GitHub that references media you produced — read MEDIA.md first, since the link-only failure mode is silent (recipients see a broken image, not an error)
 
 ### Replicas (in-workspace CLI)
 Take action *with* Replicas itself — manage automations, environments (variables, files), repos, and `replicas.json` config — using the pre-installed, pre-authenticated `replicas` CLI.

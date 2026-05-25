@@ -61,6 +61,10 @@ curl -s -X POST "https://slack.com/api/files.uploadV2" \
   -F "title=File title"
 ```
 
+### Sharing Screenshots, Recordings, or Other Media
+
+If your message references media you produced (screenshots, recordings, diagrams, audio), follow `MEDIA.md`. The short version: upload the raw bytes via `files.uploadV2` AND include a `[View in Replicas](<deep-link>)` link in the message — never just the link, never just the bytes.
+
 ### Other Operations
 
 You can list channels, read channel history, add reactions, and perform any other operation supported by the Slack Web API using the same authentication pattern.

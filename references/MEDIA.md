@@ -64,7 +64,10 @@ After (or alongside) the embeds, include a `[View in Replicas](<deep-link>)` hyp
 
 Do **both** of these — neither alone is sufficient:
 
-1. Upload the raw bytes via that platform's own upload API (Slack `files.upload`, Linear attachments, Imgur for GitHub PR/issue images, etc.) so the recipient actually sees the media.
+1. Upload the raw bytes via that platform's own upload API so the recipient actually sees the media:
+   - **Slack** — `files.uploadV2` (see `SLACK.md`)
+   - **Linear** — attachment upload via the GraphQL API (see `LINEAR.md`)
+   - **GitHub** — GitHub has no public API for attaching images to PRs/issues, so upload to Imgur (or another public host) and use the returned URL in your PR/issue markdown. Do not commit screenshots to the repo.
 2. Include a `[View in Replicas](<deep-link>)` hyperlink — use the per-file deep link the CLI printed for that file (`...?mode=media&media=<media-id>`), so the recipient lands directly on that specific item.
 
 Do **not** include the `![filename](https://api.tryreplicas.com/...)` markdown embed in external messages. It will render as a broken image / 401 for the recipient.

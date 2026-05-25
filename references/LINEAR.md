@@ -65,6 +65,10 @@ curl -s -X POST https://api.linear.app/graphql \
   }'
 ```
 
+### Sharing Screenshots, Recordings, or Other Media
+
+If your comment or issue references media you produced (screenshots, recordings, diagrams, audio), follow `MEDIA.md`. The short version: upload the raw bytes as a Linear attachment AND include a `[View in Replicas](<deep-link>)` link in the body — never just the link, never just the bytes.
+
 ### Other Operations
 
 The Linear GraphQL API supports creating issues, managing projects, labels, cycles, and more. For the full schema and documentation, see: https://developers.linear.app/docs/graphql/working-with-the-graphql-api

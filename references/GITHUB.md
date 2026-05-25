@@ -112,10 +112,6 @@ gh pr review 123 --approve
 gh pr review 123 --request-changes --body "Changes needed"
 ```
 
-## Image Uploads in PRs
+## Sharing Screenshots, Recordings, or Other Media
 
-GitHub does NOT have a public API for uploading images to PRs/issues. When you need to include images:
-- Do NOT use placeholder image URLs
-- Do NOT commit screenshots as files to the repository
-- Upload images to Imgur (or another external host) and use the returned URLs in your PR markdown
-- If you were triggered from Slack, also upload the images to the Slack thread so the user can see them directly
+If your PR description, issue, or comment references media you produced (screenshots, recordings, diagrams), follow `MEDIA.md`. The short version: upload the bytes to a public host (GitHub has no native upload API — use Imgur), use that URL in your markdown, AND include a `[View in Replicas](<deep-link>)` link. Never commit screenshots to the repo, and never use placeholder URLs.
