@@ -83,6 +83,17 @@ Use this when:
 - You record video output (browser automation, screen capture) — including the recommended aspect ratio and FPS
 - You need to embed media in a Slack/Linear/GitHub message AND keep a referenceable copy in the Replicas dashboard
 
+### Computer use (Linux desktop control)
+Drive the workspace's Linux desktop — open a browser, click, type, scroll, screenshot, record — and surface a live noVNC viewer to the user via the `replicas computer` CLI. Every Replicas workspace boots with Xvfb / openbox / x11vnc / noVNC pre-installed.
+
+**Reference:** `references/COMPUTER-USE.md`
+
+Use this when:
+- A task requires interacting with a website, web app, or desktop application that has no usable API
+- You want the user to watch the agent work — `replicas computer start` exposes a `Desktop` tab in the dashboard
+- You're testing UI changes in a browser before reporting them as done
+- You want to record a screen capture of a task as proof to share back
+
 ### Replicas (in-workspace CLI)
 Take action *with* Replicas itself — manage automations, environments (variables, files), repos, and `replicas.json` config — using the pre-installed, pre-authenticated `replicas` CLI.
 
