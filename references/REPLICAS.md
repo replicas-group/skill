@@ -49,6 +49,7 @@ In agent mode the CLI hides commands that don't make sense for in-workspace agen
 | "Run my nightly automation now" | `replicas automation run <id>` |
 | "Make an automation that runs every weekday at 9am" | `replicas automation create` (interactive) or `--trigger-cron "0 9 * * 1-5"` |
 | "Make an automation that runs when a PR opens on `acme/web`" | `replicas automation create ... --trigger-github pull_request.opened --trigger-github-repos acme/web` |
+| "Remind me at 8am about X" / "Check this once then tell me" | `replicas automation create ... --trigger-cron "0 8 * * *" --disposable` |
 | "What repos are connected?" | `replicas repos` |
 | "Set up a `replicas.json` in this repo" | `replicas init` (`-y` for YAML) |
 
@@ -149,6 +150,8 @@ replicas automation create ... --lifecycle delete_after_inactivity --auto-stop-m
 ```
 
 When the user says "make me an automation that...", default to **picking the environment for them by listing the available envs** and asking only when the user hasn't already pinned one. Same for repos in GitHub triggers. Don't pepper the user with questions you can answer by reading the existing config.
+
+**When to use `--disposable`:** If the user's request is clearly a one-time task ("remind me tomorrow", "check this once", "wait for X then tell me", "at 8am do Y"), use `--disposable` so the automation cleans itself up after firing. If it's recurring or ongoing ("every weekday", "whenever a PR opens"), don't.
 
 ### Edit
 
