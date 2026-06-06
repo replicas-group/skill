@@ -137,6 +137,9 @@ replicas automation create "Review my PRs" \
   --trigger-github pull_request.opened \
   --trigger-github-repos acme/web,acme/api
 
+# Disposable (auto-deletes after first execution)
+replicas automation create ... --disposable
+
 # Disable on creation
 replicas automation create ... --disabled
 
