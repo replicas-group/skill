@@ -22,7 +22,7 @@ Use this when:
 - You are verifying frontend/backend integrations visually
 
 ### Slack
-Send messages, read threads, search conversations, and upload files via the Slack Web API.
+Send messages, read threads, search conversations, and transfer files through the workspace-scoped `@replicas/sdk`.
 
 **Reference:** `references/SLACK.md`
 
